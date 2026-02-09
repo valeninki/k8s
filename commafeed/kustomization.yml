@@ -1,0 +1,13 @@
+resources:
+  - namespace.yml
+  - ingressroute.yml
+  - application.yml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: commafeed-postgresql
+    namespace: commafeed-k8s
+    envs:
+      - ./.db-secret.env

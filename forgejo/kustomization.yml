@@ -1,0 +1,18 @@
+resources:
+  - namespace.yml
+  - ingressroute.yml
+  - application.yml
+  - database.yml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: forgejo-admin-secret
+    namespace: forgejo-k8s
+    envs:
+      - ./.admin-secret.env
+  - name: db-secret
+    namespace: forgejo-k8s
+    envs:
+      - ./.db-secret.env

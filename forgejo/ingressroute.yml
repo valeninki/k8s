@@ -1,0 +1,38 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: forgejo
+  namespace: forgejo-k8s
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`git.valentinus.dev`)
+      priority: 10
+      services:
+        - kind: Service
+          name: forgejo-http
+          namespace: forgejo-k8s
+          passHostHeader: true
+          port: 3000
+          scheme: http
+  tls:
+    domains:
+      - main: git.valentinus.dev
+    secretName: wildcard-valentinus.dev-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: forgejo-ssh-tcp
+  namespace: forgejo-k8s
+spec:
+  entryPoints:
+    - ssh 
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: forgejo-ssh
+          port: 22

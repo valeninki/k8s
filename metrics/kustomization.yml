@@ -1,0 +1,13 @@
+resources:
+  - namespace.yml
+  - ingressroute.yml
+  - application.yml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: kube-prometheus-stack-grafana
+    namespace: metrics-k8s
+    envs:
+      - ./.grafana-secret.env
