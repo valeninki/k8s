@@ -49,7 +49,7 @@ spec:
         - name: persistence.accessMode
           value: ReadWriteMany
         - name: persistence.size
-          value: 32Gi
+          value: 40Gi
         - name: postgresql.enabled
           value: 'true'
         - name: postgresql.global.postgresql.auth.existingSecret
@@ -60,6 +60,13 @@ spec:
           value: nextcloud_db_password
       values: |
         nextcloud:
+          extraInitContainers:
+            - name: fix-subpath-directories
+              image: busybox:latest
+              command: ["sh", "-c", "mkdir -p /pv/html /pv/data /pv/config /pv/custom_apps /pv/themes && chown -R 33:33 /pv/"]
+              volumeMounts:
+                - name: nextcloud-main
+                  mountPath: /pv
           configs:
             custom.config.php: |
               <?php
