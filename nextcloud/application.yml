@@ -10,7 +10,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     repoURL: https://nextcloud.github.io/helm/
-    targetRevision: 8.*
+    targetRevision: 9.*
     chart: nextcloud
     helm:
       parameters:
@@ -47,7 +47,7 @@ spec:
         - name: persistence.enabled
           value: 'true'
         - name: persistence.accessMode
-          value: ReadWriteMany
+          value: ReadWriteOnce
         - name: persistence.size
           value: 40Gi
         - name: postgresql.enabled
@@ -102,6 +102,13 @@ spec:
               size: 2Gi
         nodeSelector:
           kubernetes.io/hostname: w1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2500Mi
   sources: []
   project: default
   syncPolicy:

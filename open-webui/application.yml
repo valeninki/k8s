@@ -1,0 +1,67 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: copilot-api
+  namespace: argocd
+spec:
+  destination:
+    namespace: open-webui-k8s
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: copilot-api
+    helm:
+      values: |-
+        nodeSelector:
+          kubernetes.io/hostname: w1
+    repoURL: https://helm.mtaha.dev
+    targetRevision: '*'
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: open-webui
+  namespace: argocd
+spec:
+  destination:
+    namespace: open-webui-k8s
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: open-webui
+    helm:
+      parameters:
+      - name: postgresql.secret.autoCreate
+        value: kustomize
+      values: |-
+        main:
+          environments:
+            - name: WEBUI_URL
+              value: https://ai.valentinus.dev
+            - name: WEBUI_NAME
+              value: "Kerem's AI Assistant"
+            - name: ENABLE_SIGNUP
+              value: "False"
+            - name: DEFAULT_LOCALE
+              value: "en"
+            - name: DEFAULT_MODELS
+              value: "None"
+            - name: ENABLE_EVALUATION_ARENA_MODELS
+              value: "False"
+        nodeSelector:
+          kubernetes.io/hostname: w1
+        resources:
+          limits:
+            cpu: 400m
+            memory: 2048Mi
+    repoURL: https://helm.mtaha.dev
+    targetRevision: '*'
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
