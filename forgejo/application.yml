@@ -19,10 +19,6 @@ spec:
           value: "Forgejo: Valen's Private Git Instance."
         - name: gitea.admin.existingSecret
           value: forgejo-admin-secret
-        - name: gitea.admin.username
-          value: forgejo_admin_username
-        - name: gitea.admin.password
-          value: forgejo_admin_password
       values: |
         nodeSelector:
           kubernetes.io/hostname: w2

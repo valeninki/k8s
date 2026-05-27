@@ -1,0 +1,47 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kured
+  namespace: argocd
+spec:
+  destination:
+    namespace: kured
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kured
+    helm:
+      values: |
+        tolerations:
+          - key: "node-role.kubernetes.io/master"
+            operator: "Exists"
+            effect: "NoSchedule"
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
+        configuration:
+          startTime: "04:00"
+          endTime: "06:00"
+          timeZone: "Europe/Istanbul"
+          rebootDays:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          period: "60m"
+          alertFilterRegex:
+            target:
+              - .*
+        prometheus:
+          metrics:
+            enabled: true
+    repoURL: https://kubereboot.github.io/charts
+    targetRevision: '*'
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
