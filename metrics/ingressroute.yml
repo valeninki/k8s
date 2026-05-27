@@ -2,7 +2,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: kube-prometheus-stack-grafana
+  name: victoria-metrics-grafana
   namespace: metrics-k8s
 spec:
   entryPoints:
@@ -13,7 +13,7 @@ spec:
       priority: 10
       services:
         - kind: Service
-          name: kube-prometheus-stack-grafana
+          name: victoria-metrics-grafana
           namespace: metrics-k8s
           passHostHeader: true
           port: 80

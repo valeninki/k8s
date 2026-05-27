@@ -7,7 +7,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 secretGenerator:
-  - name: kube-prometheus-stack-grafana
+  - name: vm-grafana
     namespace: metrics-k8s
     envs:
       - ./.grafana-secret.env

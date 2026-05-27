@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kube-prometheus-stack-grafana
+  name: victoria-metrics
   namespace: argocd
 spec:
   destination:
@@ -10,21 +10,77 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: kube-prometheus-stack
+    chart: victoria-metrics-k8s-stack
     helm:
-      parameters:
-      - name: grafana.persistence.enabled
-        value: "true"
-      - name: grafana.persistence.size
-        value: 1Gi
-      - name: grafana.admin.userKey
-        value: admin-user
-      - name: grafana.admin.passwordKey
-        value: admin-pass
-      - name: grafana.admin.existingSecret
-        value: kube-prometheus-stack-grafana
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: '*'
+      values: |-
+        grafana:
+          plugins: []
+          persistence:
+            enabled: true
+            size: 1Gi
+          admin:
+            existingSecret: vm-grafana
+            userKey: admin-user
+            passwordKey: admin-pass
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 1Gi
+
+        vmsingle:
+          enabled: true
+          spec:
+            retentionPeriod: "14"
+            storage:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+
+        vmagent:
+          enabled: true
+          spec:
+            scrapeInterval: 60s
+            selectAllByDefault: true
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 300m
+                memory: 256Mi
+
+        kubeControllerManager:
+          enabled: false
+        kubeScheduler:
+          enabled: false
+
+        kube-state-metrics:
+          enabled: true
+
+        node-exporter:
+          enabled: true
+
+        defaultRules:
+          rules:
+            kubernetes: true
+            node: true
+            vmagent: true
+            vmsingle: true
+            vmhealth: true
+    repoURL: https://victoriametrics.github.io/helm-charts
+    targetRevision: 0.*
   syncPolicy:
     automated: {}
     syncOptions:
