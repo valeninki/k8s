@@ -543,6 +543,7 @@ spec:
         - name: FORGEJO__SERVER__SSH_DOMAIN
           value: git.valentinus.dev
       config:
+        APP_NAME: "Forgejo: Valen's Private Git Instance."
         repository:
           ROOT: /data/git/gitea-repositories
         repository.pull-request:
