@@ -6,7 +6,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/kubernetes-reflector/static
+  path: ./flux-system/apps/kubernetes-reflector/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -20,7 +20,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/cert-manager/static
+  path: ./flux-system/apps/cert-manager/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -34,7 +34,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/kured/static
+  path: ./flux-system/apps/kured/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -48,7 +48,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/longhorn/static
+  path: ./flux-system/apps/longhorn/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -62,7 +62,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/victoria-metrics/static
+  path: ./flux-system/apps/victoria-metrics/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -76,7 +76,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/adguard-home/static
+  path: ./flux-system/apps/adguard-home/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -90,7 +90,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/commafeed/static
+  path: ./flux-system/apps/commafeed/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -104,7 +104,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/forgejo/static
+  path: ./flux-system/apps/forgejo/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -118,7 +118,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/jellyfin/static
+  path: ./flux-system/apps/jellyfin/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -132,7 +132,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/nextcloud/static
+  path: ./flux-system/apps/nextcloud/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -146,7 +146,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/vaultwarden/static
+  path: ./flux-system/apps/vaultwarden/static
   prune: false
   sourceRef:
     kind: GitRepository
@@ -160,7 +160,7 @@ metadata:
 spec:
   interval: 1h
   suspend: true
-  path: ./clusters/cloud-context/apps/argocd/static
+  path: ./flux-system/apps/argocd/static
   prune: false
   sourceRef:
     kind: GitRepository
