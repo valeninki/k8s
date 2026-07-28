@@ -41,6 +41,7 @@ spec:
         kind: HelmRepository
         name: jetstack
   install:
+    disableHooks: true
     disableTakeOwnership: false
     remediation:
       retries: 0
