@@ -89,7 +89,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   path: ./flux-system/apps/adguard-home/static
   prune: false
   sourceRef:

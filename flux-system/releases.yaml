@@ -333,7 +333,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: adguard-home
   targetNamespace: adguard-home-k8s
   chart:
