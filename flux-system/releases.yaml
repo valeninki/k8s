@@ -595,7 +595,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: jellyfin
   targetNamespace: nextcloud-k8s
   chart:
