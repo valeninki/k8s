@@ -408,6 +408,12 @@ spec:
       retries: 0
   values:
     nextcloud:
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-app-secret
+        usernameKey: nextcloud_admin_username
+        passwordKey: nextcloud_admin_password
+      host: cloud.valentinus.dev
       extraInitContainers:
         - name: fix-subpath-directories
           image: busybox:latest
