@@ -1,0 +1,118 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: emberstack
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://emberstack.github.io/helm-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.jetstack.io
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://metallb.github.io/metallb
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://traefik.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cloudnative-pg
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://cloudnative-pg.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kured
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://kubereboot.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: longhorn
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://charts.longhorn.io/
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: victoria-metrics
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://victoriametrics.github.io/helm-charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: mtaha
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://helm.mtaha.dev
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jellyfin
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://jellyfin.github.io/jellyfin-helm
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: nextcloud
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://nextcloud.github.io/helm/
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: argo
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://argoproj.github.io/argo-helm
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: forgejo
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: oci://code.forgejo.org/forgejo-helm/forgejo
+  ref:
+    digest: sha256:445fd301decda081eeb262b7d7d71e734a4d108686d11a0894c76baa7d993a3e

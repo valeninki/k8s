@@ -1,0 +1,672 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kubernetes-reflector
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: kubernetes-reflector
+  targetNamespace: kubernetes-reflector
+  chart:
+    spec:
+      chart: reflector
+      version: 10.0.60
+      sourceRef:
+        kind: HelmRepository
+        name: emberstack
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    cron:
+      schedule: "*/15 * * * *"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: cert-manager
+  targetNamespace: kube-system
+  chart:
+    spec:
+      chart: cert-manager
+      version: v1.21.0
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    installCRDs: true
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: metallb
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: metallb
+  targetNamespace: metallb-system
+  chart:
+    spec:
+      chart: metallb
+      version: 0.16.1
+      sourceRef:
+        kind: HelmRepository
+        name: metallb
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: traefik
+  targetNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 41.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    ports:
+      ssh:
+        port: 2222
+        expose:
+          default: true
+        exposedPort: 2222
+        hostPort: 2222
+        protocol: TCP
+      websecure:
+        hostPort: 443
+    nodeSelector:
+      kubernetes.io/hostname: m1
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    additionalArguments:
+      - --entrypoints.name.http3
+      - --providers.kubernetescrd.allowCrossNamespace=true
+      - --providers.kubernetescrd.allowExternalNameServices=true
+      - --serverstransport.insecureskipverify=true
+    deployment:
+      replicas: 1
+      revisionHistoryLimit: 0
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+    service:
+      enabled: false
+    tlsStore:
+      default:
+        defaultCertificate:
+          secretName: wildcard-valentinus.dev-tls
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudnative-pg
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: cloudnative-pg
+  targetNamespace: cnpg-system
+  chart:
+    spec:
+      chart: cloudnative-pg
+      version: 0.29.0
+      sourceRef:
+        kind: HelmRepository
+        name: cloudnative-pg
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kured
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: kured
+  targetNamespace: kured
+  chart:
+    spec:
+      chart: kured
+      version: 6.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: kured
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    configuration:
+      startTime: "04:00"
+      endTime: "06:00"
+      timeZone: Europe/Istanbul
+      rebootDays:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      period: 60m
+      alertFilterRegex:
+        target:
+          - .*
+    prometheus:
+      metrics:
+        enabled: true
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: longhorn
+  targetNamespace: longhorn-system
+  chart:
+    spec:
+      chart: longhorn
+      version: 1.12.0
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    global:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+    defaultBackupStore:
+      backupTarget: s3://cluster-backup@garage/
+      backupTargetCredentialSecret: cluster-key
+    preUpgradeChecker:
+      jobEnabled: true
+    longhornUI:
+      replicas: 1
+    defaultSettings:
+      replicaCount: 2
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victoria-metrics
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: victoria-metrics
+  targetNamespace: metrics-k8s
+  chart:
+    spec:
+      chart: victoria-metrics-k8s-stack
+      version: 0.87.0
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    grafana:
+      plugins: []
+      persistence:
+        enabled: true
+        size: 1Gi
+      admin:
+        existingSecret: vm-grafana
+        userKey: admin-user
+        passwordKey: admin-pass
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 300m
+          memory: 1Gi
+    vmsingle:
+      enabled: true
+      spec:
+        retentionPeriod: "14"
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+    vmagent:
+      enabled: true
+      spec:
+        scrapeInterval: 60s
+        selectAllByDefault: true
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kube-state-metrics:
+      enabled: true
+    prometheus-node-exporter:
+      enabled: true
+    defaultRules:
+      enabled: true
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: adguard-home
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: adguard-home
+  targetNamespace: adguard-home-k8s
+  chart:
+    spec:
+      chart: adguard-home
+      version: 4.0.12
+      sourceRef:
+        kind: HelmRepository
+        name: mtaha
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    nodeSelector:
+      kubernetes.io/hostname: w2
+    main:
+      tls:
+        secretName: wildcard-valentinus.dev-tls
+        serverName: dns.valentinus.dev
+      podCIDR: 172.16.0.0/16
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: commafeed
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: commafeed
+  targetNamespace: commafeed-k8s
+  chart:
+    spec:
+      chart: commafeed
+      version: 8.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: mtaha
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    main:
+      options:
+        publicUrl: rss.valentinus.dev
+    postgresql:
+      secret:
+        autoCreate: kustomize
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: nextcloud
+  targetNamespace: nextcloud-k8s
+  chart:
+    spec:
+      chart: nextcloud
+      version: 9.2.5
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    nextcloud:
+      extraInitContainers:
+        - name: fix-subpath-directories
+          image: busybox:latest
+          command: ["sh", "-c", "mkdir -p /pv/html /pv/data /pv/config /pv/custom_apps /pv/themes && chown -R 33:33 /pv/"]
+          volumeMounts:
+            - name: nextcloud-main
+              mountPath: /pv
+      configs:
+        custom.config.php: |
+          <?php
+          $CONFIG = array (
+            'trusted_domains' =>
+            array (
+              0 => 'cloud.valentinus.dev',
+            ),
+            'overwrite.cli.url' => 'https://cloud.valentinus.dev',
+            'overwriteprotocol' => 'https',
+            'default_phone_region' => 'TR',
+            'trusted_proxies' =>
+            array (
+              0 => '127.0.0.1',
+            ),
+            'maintenance_window_start' => 1,
+          );
+      phpConfigs:
+        zz-nc-custom.ini: |-
+          memory_limit = 512M
+          upload_max_filesize = 2G
+          post_max_size = 2G
+          max_execution_time = 300
+          file_uploads = On
+          allow_url_fopen = On
+    postgresql:
+      enabled: true
+      primary:
+        nodeSelector:
+          kubernetes.io/hostname: w1
+        persistence:
+          enabled: true
+          accessMode: ReadWriteOnce
+          size: 2Gi
+      global:
+        postgresql:
+          auth:
+            existingSecret: nextcloud-db-secret
+            secretKeys:
+              adminPasswordKey: nextcloud_db_admin_password
+              userPasswordKey: nextcloud_db_password
+    nodeSelector:
+      kubernetes.io/hostname: w1
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2500Mi
+    cronjob:
+      enabled: true
+    externalDatabase:
+      enabled: true
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-db-secret
+        passwordKey: nextcloud_db_password
+        usernameKey: nextcloud_db_username
+      type: postgresql
+    image:
+      flavor: fpm
+    internalDatabase:
+      enabled: false
+    nginx:
+      enabled: true
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 40Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: forgejo
+  targetNamespace: forgejo-k8s
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    nodeSelector:
+      kubernetes.io/hostname: w2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 512Mi
+    gitea:
+      additionalConfigFromEnvs:
+        - name: FORGEJO__DATABASE__DB_TYPE
+          value: postgres
+        - name: FORGEJO__DATABASE__HOST
+          value: forgejo-db-rw.forgejo-k8s.svc.cluster.local:5432
+        - name: FORGEJO__DATABASE__NAME
+          value: forgejo
+        - name: FORGEJO__DATABASE__USER
+          value: forgejo
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        - name: FORGEJO__SERVER__ROOT_URL
+          value: https://git.valentinus.dev
+        - name: FORGEJO__SERVER__DOMAIN
+          value: git.valentinus.dev
+        - name: FORGEJO__SECURITY__GLOBAL_TWO_FACTOR_REQUIREMENT
+          value: all
+        - name: FORGEJO__SERVER__SSH_DOMAIN
+          value: git.valentinus.dev
+      config:
+        repository:
+          ROOT: /data/git/gitea-repositories
+        repository.pull-request:
+          WORK_IN_PROGRESS_PREFIXES: "WIP:,[WIP]:"
+        indexer:
+          ISSUE_INDEXER_TYPE: bleve
+          REPO_INDEXER_ENABLED: true
+      admin:
+        existingSecret: forgejo-admin-secret
+    postgresql-ha:
+      enabled: false
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: false
+    postgresql:
+      enabled: false
+    persistence:
+      enabled: true
+      size: 10Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: argocd
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: argocd
+  targetNamespace: argocd
+  chart:
+    spec:
+      chart: argo-cd
+      version: 10.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: argo
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    configs:
+      params:
+        server.insecure: true
+    global:
+      domain: argo.valentinus.dev
+    nodeSelector:
+      kubernetes.io/hostname: m1
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jellyfin
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: jellyfin
+  targetNamespace: nextcloud-k8s
+  chart:
+    spec:
+      chart: jellyfin
+      version: 3.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: jellyfin
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    podSecurityContext:
+      runAsUser: 33
+      runAsGroup: 33
+      fsGroup: 33
+    nodeSelector:
+      kubernetes.io/hostname: w1
+    deploymentStrategy:
+      type: Recreate
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    startupProbe:
+      tcpSocket: null
+      httpGet:
+        path: /health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 30
+    livenessProbe:
+      initialDelaySeconds: 90
+    persistence:
+      config:
+        enabled: true
+        accessMode: ReadWriteOnce
+        size: 3Gi
+      media:
+        enabled: true
+        existingClaim: nextcloud-nextcloud
+        mountPath: /mnt/Music
+        subPath: data/valentinus/files/Music
+        readOnly: true
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vaultwarden
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  releaseName: vaultwarden
+  targetNamespace: vaultwarden-k8s
+  chart:
+    spec:
+      chart: vaultwarden
+      version: 7.3.4
+      sourceRef:
+        kind: HelmRepository
+        name: mtaha
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    postgresql:
+      secret:
+        autoCreate: kustomize

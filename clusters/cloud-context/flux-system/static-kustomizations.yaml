@@ -1,0 +1,167 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubernetes-reflector-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/kubernetes-reflector/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/cert-manager/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kured-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/kured/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: longhorn-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/longhorn/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: victoria-metrics-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/victoria-metrics/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: adguard-home-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/adguard-home/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: commafeed-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/commafeed/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: forgejo-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/forgejo/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: jellyfin-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/jellyfin/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nextcloud-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/nextcloud/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: vaultwarden-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/vaultwarden/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: argocd-static
+  namespace: flux-system
+spec:
+  interval: 1h
+  suspend: true
+  path: ./clusters/cloud-context/apps/argocd/static
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

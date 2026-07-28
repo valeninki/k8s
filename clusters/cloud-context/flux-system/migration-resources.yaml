@@ -1,0 +1,4 @@
+resources:
+  - sources.yaml
+  - releases.yaml
+  - static-kustomizations.yaml
