@@ -30,7 +30,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: cert-manager
   targetNamespace: kube-system
   chart:
