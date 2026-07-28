@@ -103,7 +103,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   path: ./flux-system/apps/commafeed/static
   prune: false
   sourceRef:
