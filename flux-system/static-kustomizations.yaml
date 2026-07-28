@@ -145,7 +145,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   path: ./flux-system/apps/nextcloud/static
   prune: false
   sourceRef:
