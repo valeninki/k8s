@@ -265,6 +265,7 @@ spec:
         kind: HelmRepository
         name: victoria-metrics
   install:
+    disableHooks: true
     disableTakeOwnership: false
     remediation:
       retries: 0
