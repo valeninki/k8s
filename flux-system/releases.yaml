@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: kubernetes-reflector
   targetNamespace: kubernetes-reflector
   chart:
