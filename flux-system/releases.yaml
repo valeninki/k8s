@@ -654,7 +654,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: vaultwarden
   targetNamespace: vaultwarden-k8s
   chart:
