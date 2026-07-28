@@ -568,36 +568,6 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: argocd
-  namespace: flux-system
-spec:
-  interval: 1h
-  suspend: true
-  releaseName: argocd
-  targetNamespace: argocd
-  chart:
-    spec:
-      chart: argo-cd
-      version: 10.2.1
-      sourceRef:
-        kind: HelmRepository
-        name: argo
-  install:
-    disableTakeOwnership: false
-    remediation:
-      retries: 0
-  values:
-    configs:
-      params:
-        server.insecure: true
-    global:
-      domain: argo.valentinus.dev
-    nodeSelector:
-      kubernetes.io/hostname: m1
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
   name: jellyfin
   namespace: flux-system
 spec:
