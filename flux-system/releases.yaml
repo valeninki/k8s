@@ -254,7 +254,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  suspend: true
+  suspend: false
   releaseName: victoria-metrics
   targetNamespace: metrics-k8s
   chart:
