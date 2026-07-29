@@ -48,6 +48,8 @@ spec:
                     initContainers:
                       - name: adguard-home-main-dns-rewrite-loader
                         image: mikefarah/yq:latest
+                        securityContext:
+                          runAsUser: 0
                         command:
                           - sh
                           - -ec
