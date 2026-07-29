@@ -11,7 +11,7 @@ spec:
     branch: k0s
   secretRef:
     name: forgejo-flux-runtime
-  url: ssh://git@ssh.git.valentinus.dev:2222/valeninki/k8s.git
+  url: ssh://git@git.valentinus.dev/valeninki/k8s.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
