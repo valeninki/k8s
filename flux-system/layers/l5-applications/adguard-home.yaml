@@ -40,6 +40,9 @@ spec:
                 name: adguard-home-main
                 namespace: adguard-home-k8s
               spec:
+                strategy:
+                  type: Recreate
+                  rollingUpdate: null
                 template:
                   spec:
                     initContainers:
