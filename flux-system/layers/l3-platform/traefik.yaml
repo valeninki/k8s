@@ -1,0 +1,84 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 1h
+  timeout: 10m
+  suspend: false
+  dependsOn:
+    - name: metallb
+  releaseName: traefik
+  targetNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 41.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    ports:
+      ssh:
+        port: 2222
+        expose:
+          default: true
+        exposedPort: 22
+        hostPort: 0
+        protocol: TCP
+      web:
+        port: 8000
+        expose:
+          default: true
+        exposedPort: 80
+        hostPort: 80
+        protocol: TCP
+      websecure:
+        port: 8443
+        expose:
+          default: true
+        exposedPort: 443
+        hostPort: 443
+        protocol: TCP
+    nodeSelector:
+      kubernetes.io/hostname: m1
+    tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    additionalArguments:
+      - --entrypoints.name.http3
+      - --providers.kubernetescrd.allowCrossNamespace=true
+      - --providers.kubernetescrd.allowExternalNameServices=true
+      - --serverstransport.insecureskipverify=true
+    deployment:
+      replicas: 1
+      revisionHistoryLimit: 0
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+    service:
+      enabled: true
+      annotations:
+        metallb.io/loadBalancerIPs: "172.16.20.50"
+      spec:
+        type: LoadBalancer
+    tlsStore:
+      default:
+        defaultCertificate:
+          secretName: wildcard-valentinus.dev-tls

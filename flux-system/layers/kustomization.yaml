@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - l2-namespaces.yaml
+  - l2-sops-secrets.yaml
+  - l3-storage.yaml
+  - l3-platform.yaml
+  - l4-prerequisites.yaml
+  - l5-applications.yaml
+  - l6-routes.yaml

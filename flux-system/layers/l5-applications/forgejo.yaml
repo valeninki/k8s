@@ -1,0 +1,77 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: flux-system
+spec:
+  interval: 1h
+  timeout: 15m
+  suspend: false
+  dependsOn:
+    - name: longhorn
+    - name: cloudnative-pg
+    - name: traefik
+  releaseName: forgejo
+  targetNamespace: forgejo-k8s
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    nodeSelector:
+      kubernetes.io/hostname: w2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 512Mi
+    gitea:
+      additionalConfigFromEnvs:
+        - name: FORGEJO__DATABASE__DB_TYPE
+          value: postgres
+        - name: FORGEJO__DATABASE__HOST
+          value: forgejo-db-rw.forgejo-k8s.svc.cluster.local:5432
+        - name: FORGEJO__DATABASE__NAME
+          value: forgejo
+        - name: FORGEJO__DATABASE__USER
+          value: forgejo
+        - name: FORGEJO__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        - name: FORGEJO__SERVER__ROOT_URL
+          value: https://git.valentinus.dev
+        - name: FORGEJO__SERVER__DOMAIN
+          value: git.valentinus.dev
+        - name: FORGEJO__SECURITY__GLOBAL_TWO_FACTOR_REQUIREMENT
+          value: all
+        - name: FORGEJO__SERVER__SSH_DOMAIN
+          value: git.valentinus.dev
+      config:
+        APP_NAME: "Forgejo: Valen's Private Git Instance."
+        repository:
+          ROOT: /data/git/gitea-repositories
+        repository.pull-request:
+          WORK_IN_PROGRESS_PREFIXES: "WIP:,[WIP]:"
+        indexer:
+          ISSUE_INDEXER_TYPE: bleve
+          REPO_INDEXER_ENABLED: true
+      admin:
+        existingSecret: forgejo-admin-secret
+    postgresql-ha:
+      enabled: false
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: false
+    postgresql:
+      enabled: false
+    persistence:
+      enabled: true
+      size: 10Gi

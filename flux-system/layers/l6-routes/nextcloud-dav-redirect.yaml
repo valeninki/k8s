@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: dav-redirect
+  namespace: nextcloud-k8s
+spec:
+  redirectRegex:
+    regex: ^/.well-known/(carddav|caldav)
+    replacement: /remote.php/dav/
+    permanent: true

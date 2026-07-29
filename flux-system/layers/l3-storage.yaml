@@ -1,0 +1,23 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: l3-storage
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 20m
+  wait: true
+  prune: false
+  dependsOn:
+    - name: l2-namespaces
+    - name: l2-sops-secrets
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: longhorn
+      namespace: flux-system
+  path: ./flux-system/layers/l3-storage
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

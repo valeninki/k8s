@@ -1,0 +1,110 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: flux-system
+spec:
+  interval: 1h
+  timeout: 20m
+  suspend: false
+  dependsOn:
+    - name: longhorn
+    - name: traefik
+  releaseName: nextcloud
+  targetNamespace: nextcloud-k8s
+  chart:
+    spec:
+      chart: nextcloud
+      version: 9.2.5
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud
+  install:
+    disableTakeOwnership: false
+    remediation:
+      retries: 0
+  values:
+    nextcloud:
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-app-secret
+        usernameKey: nextcloud_admin_username
+        passwordKey: nextcloud_admin_password
+      host: cloud.valentinus.dev
+      extraInitContainers:
+        - name: fix-subpath-directories
+          image: busybox:latest
+          command: ["sh", "-c", "mkdir -p /pv/html /pv/data /pv/config /pv/custom_apps /pv/themes && chown -R 33:33 /pv/"]
+          volumeMounts:
+            - name: nextcloud-main
+              mountPath: /pv
+      configs:
+        custom.config.php: |
+          <?php
+          $CONFIG = array (
+            'trusted_domains' =>
+            array (
+              0 => 'cloud.valentinus.dev',
+            ),
+            'overwrite.cli.url' => 'https://cloud.valentinus.dev',
+            'overwriteprotocol' => 'https',
+            'default_phone_region' => 'TR',
+            'trusted_proxies' =>
+            array (
+              0 => '127.0.0.1',
+            ),
+            'maintenance_window_start' => 1,
+          );
+      phpConfigs:
+        zz-nc-custom.ini: |-
+          memory_limit = 512M
+          upload_max_filesize = 2G
+          post_max_size = 2G
+          max_execution_time = 300
+          file_uploads = On
+          allow_url_fopen = On
+    postgresql:
+      enabled: true
+      primary:
+        nodeSelector:
+          kubernetes.io/hostname: w1
+        persistence:
+          enabled: true
+          accessMode: ReadWriteOnce
+          size: 2Gi
+      global:
+        postgresql:
+          auth:
+            existingSecret: nextcloud-db-secret
+            secretKeys:
+              adminPasswordKey: nextcloud_db_admin_password
+              userPasswordKey: nextcloud_db_password
+    nodeSelector:
+      kubernetes.io/hostname: w1
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2500Mi
+    cronjob:
+      enabled: true
+    externalDatabase:
+      enabled: true
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-db-secret
+        passwordKey: nextcloud_db_password
+        usernameKey: nextcloud_db_username
+      type: postgresql
+    image:
+      flavor: fpm
+    internalDatabase:
+      enabled: false
+    nginx:
+      enabled: true
+    persistence:
+      enabled: true
+      accessMode: ReadWriteOnce
+      size: 40Gi

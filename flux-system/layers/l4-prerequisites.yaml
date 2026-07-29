@@ -1,0 +1,30 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: l4-prerequisites
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  timeout: 20m
+  wait: true
+  prune: false
+  dependsOn:
+    - name: l2-sops-secrets
+    - name: l3-platform
+  healthChecks:
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      name: mainissuer
+    - apiVersion: cert-manager.io/v1
+      kind: Certificate
+      name: wildcard-valentinus.dev
+      namespace: traefik
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      name: forgejo-db
+      namespace: forgejo-k8s
+  path: ./flux-system/layers/l4-prerequisites
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

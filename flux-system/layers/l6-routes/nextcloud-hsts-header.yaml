@@ -1,0 +1,9 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hsts-header
+  namespace: nextcloud-k8s
+spec:
+  headers:
+    stsSeconds: 15552000
+    stsIncludeSubdomains: true

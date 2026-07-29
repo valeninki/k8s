@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: adguard-home-header
+  namespace: adguard-home-k8s
+spec:
+  headers:
+    customRequestHeaders:
+      Host: adguard-home-main.adguard-home-k8s.svc.cluster.local:443
+      X-Real-IP: localhost
