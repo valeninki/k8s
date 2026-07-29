@@ -21,7 +21,9 @@ metadata:
 spec:
   interval: 10m0s
   path: ./flux-system
-  prune: true
+  # Ownership moves to child Kustomizations in the next reconciliation.
+  # Keep existing objects while their inventory is transferred.
+  prune: false
   sourceRef:
     kind: GitRepository
     name: flux-system
