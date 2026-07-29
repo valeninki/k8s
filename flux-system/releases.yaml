@@ -105,13 +105,14 @@ spec:
         expose:
           default: true
         exposedPort: 80
+        hostPort: 80
         protocol: TCP
       websecure:
         port: 8443
         expose:
           default: true
         exposedPort: 443
-        hostPort: 0
+        hostPort: 443
         protocol: TCP
     nodeSelector:
       kubernetes.io/hostname: m1
