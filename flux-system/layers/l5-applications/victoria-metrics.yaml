@@ -41,6 +41,8 @@ spec:
         limits:
           cpu: 300m
           memory: 1Gi
+    alertmanager:
+      name: alertmanager
     vmsingle:
       enabled: true
       spec:
