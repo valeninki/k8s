@@ -43,34 +43,6 @@ spec:
                 strategy:
                   type: Recreate
                   rollingUpdate: null
-                template:
-                  spec:
-                    initContainers:
-                      - name: adguard-home-main-dns-rewrite-loader
-                        image: mikefarah/yq:latest
-                        securityContext:
-                          runAsUser: 0
-                        command:
-                          - sh
-                          - -ec
-                          - |
-                            config=/opt/adguardhome/conf/AdGuardHome.yaml
-                            if [ ! -f "$config" ]; then
-                              echo "AdGuard Home is not initialized; DNS rewrite will be applied on its next restart"
-                              exit 0
-                            fi
-                            yq eval '
-                              .dns.rewrites = (
-                                (.dns.rewrites // [])
-                                | map(select(.domain != "git.valentinus.dev"))
-                                + [{"domain": "git.valentinus.dev", "answer": "172.16.20.50", "enabled": true}]
-                              )
-                            ' "$config" > /tmp/AdGuardHome.yaml.new
-                            mv /tmp/AdGuardHome.yaml.new "$config"
-                        volumeMounts:
-                          - name: adguard-home-data
-                            mountPath: /opt/adguardhome/conf
-                            subPath: conf
   values:
     nodeSelector:
       kubernetes.io/hostname: w2
