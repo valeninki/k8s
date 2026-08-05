@@ -24,6 +24,13 @@ spec:
     remediation:
       retries: 0
   values:
+    image:
+      main:
+        tag: "1.36.0"
+    main:
+      environments:
+        - name: DOMAIN
+          value: https://vault.valentinus.dev
     postgresql:
       secret:
         autoCreate: kustomize
