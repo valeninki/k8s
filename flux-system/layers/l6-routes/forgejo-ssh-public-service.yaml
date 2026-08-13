@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forgejo-ssh-public
+  namespace: forgejo-k8s
+spec:
+  type: ClusterIP
+  externalIPs:
+    - 167.233.190.40
+  externalTrafficPolicy: Local
+  selector:
+    app.kubernetes.io/instance: forgejo
+    app.kubernetes.io/name: forgejo
+  ports:
+    - name: ssh
+      protocol: TCP
+      port: 22
+      targetPort: ssh

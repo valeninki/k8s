@@ -24,13 +24,6 @@ spec:
       retries: 0
   values:
     ports:
-      ssh:
-        port: 2222
-        expose:
-          default: true
-        exposedPort: 22
-        hostPort: 0
-        protocol: TCP
       web:
         port: 8000
         expose:
@@ -79,6 +72,8 @@ spec:
       spec:
         type: LoadBalancer
         allocateLoadBalancerNodePorts: false
+        externalIPs:
+          - 167.233.190.40
     tlsStore:
       default:
         defaultCertificate:

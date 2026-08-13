@@ -6,7 +6,7 @@ resources:
   - adguard-home-main.yaml
   - commafeed.yaml
   - forgejo.yaml
-  - forgejo-ssh-routing.yaml
+  - forgejo-ssh-public-service.yaml
   - jellyfin.yaml
   - nextcloud-dav-redirect.yaml
   - nextcloud-hsts-header.yaml
