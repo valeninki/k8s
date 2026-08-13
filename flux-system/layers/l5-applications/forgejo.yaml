@@ -55,6 +55,13 @@ spec:
           value: git.valentinus.dev
       config:
         APP_NAME: "Forgejo: Valen's Private Git Instance."
+        server:
+          START_SSH_SERVER: true
+          SSH_LISTEN_HOST: 0.0.0.0
+          SSH_LISTEN_PORT: 2222
+          SSH_DOMAIN: git.valentinus.dev
+          SSH_PORT: 22
+          BUILTIN_SSH_SERVER_USER: git
         repository:
           ROOT: /data/git/gitea-repositories
         repository.pull-request:

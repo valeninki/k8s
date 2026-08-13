@@ -25,11 +25,11 @@ spec:
   values:
     ports:
       ssh:
-        port: 2222
+        port: 22
         expose:
-          default: true
-        exposedPort: 22
-        hostPort: 0
+          default: false
+        hostPort: 22
+        hostIP: 167.233.190.40
         protocol: TCP
       web:
         port: 8000
@@ -46,7 +46,7 @@ spec:
         hostPort: 443
         protocol: TCP
     nodeSelector:
-      kubernetes.io/hostname: m1
+      kubernetes.io/hostname: w2
     tolerations:
       - key: node-role.kubernetes.io/master
         operator: Exists
@@ -78,6 +78,7 @@ spec:
         metallb.io/loadBalancerIPs: "172.16.20.50"
       spec:
         type: LoadBalancer
+        allocateLoadBalancerNodePorts: false
     tlsStore:
       default:
         defaultCertificate:
