@@ -16,6 +16,8 @@ spec:
         spec:
           automountServiceAccountToken: false
           restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: w2
           volumes:
             - name: deploy-key
               secret:
@@ -73,9 +75,11 @@ spec:
               resources:
                 requests:
                   cpu: 250m
+                  ephemeral-storage: 1Gi
                   memory: 512Mi
                 limits:
                   cpu: "2"
+                  ephemeral-storage: 4Gi
                   memory: 2Gi
               volumeMounts:
                 - name: deploy-key
