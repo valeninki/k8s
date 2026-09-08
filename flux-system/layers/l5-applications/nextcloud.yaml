@@ -54,6 +54,8 @@ spec:
               0 => '127.0.0.1',
             ),
             'maintenance_window_start' => 1,
+            'tempdirectory' => '/var/www/html/data/tmp',
+            'files.chunked_upload.max_size' => 10485760,
           );
       phpConfigs:
         zz-nc-custom.ini: |-
