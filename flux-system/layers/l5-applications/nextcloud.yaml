@@ -63,6 +63,14 @@ spec:
           max_execution_time = 300
           file_uploads = On
           allow_url_fopen = On
+      extraVolumes:
+        - name: nextcloud-tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+      extraVolumeMounts:
+        - name: nextcloud-tmp
+          mountPath: /tmp
     postgresql:
       enabled: true
       primary:
@@ -85,9 +93,11 @@ spec:
       requests:
         cpu: 250m
         memory: 512Mi
+        ephemeral-storage: 1Gi
       limits:
         cpu: 2000m
         memory: 2500Mi
+        ephemeral-storage: 4Gi
     cronjob:
       enabled: true
     externalDatabase:
