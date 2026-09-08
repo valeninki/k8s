@@ -44,6 +44,7 @@ spec:
                       cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
                       chmod 600 "$HOME/.ssh/id_ed25519"
                       ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+                      export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"
 
                       git clone --branch unstable --single-branch \
                         ssh://git@forgejo-ssh.forgejo-k8s.svc.cluster.local:22/valeninki/dotfiles.nix.git \
