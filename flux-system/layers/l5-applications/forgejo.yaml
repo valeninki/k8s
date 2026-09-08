@@ -30,6 +30,14 @@ spec:
       requests:
         cpu: 100m
         memory: 512Mi
+    extraVolumes:
+      - name: catppuccin-theme
+        configMap:
+          name: forgejo-theme-catppuccin
+    extraContainerVolumeMounts:
+      - name: catppuccin-theme
+        mountPath: /data/gitea/public/assets/css
+        readOnly: true
     gitea:
       additionalConfigFromEnvs:
         - name: FORGEJO__DATABASE__DB_TYPE
@@ -62,6 +70,9 @@ spec:
           SSH_DOMAIN: git.valentinus.dev
           SSH_PORT: 22
           BUILTIN_SSH_SERVER_USER: git
+        ui:
+          THEMES: "auto,forgejo-auto,forgejo-light,forgejo-dark,catppuccin-mocha-mauve"
+          DEFAULT_THEME: catppuccin-mocha-mauve
         repository:
           ROOT: /data/git/gitea-repositories
         repository.pull-request:

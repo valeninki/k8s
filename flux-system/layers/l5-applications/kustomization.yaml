@@ -9,3 +9,10 @@ resources:
   - flake-update-cronjob.yaml
   - jellyfin.yaml
   - vaultwarden.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: forgejo-theme-catppuccin
+    namespace: forgejo-k8s
+    files:
+      - theme-catppuccin-mocha-mauve.css
