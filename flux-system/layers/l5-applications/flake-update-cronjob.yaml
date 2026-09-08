@@ -27,6 +27,15 @@ spec:
           containers:
             - name: flake-update
               image: nixos/nix:latest
+              env:
+                - name: GIT_AUTHOR_NAME
+                  value: Bentley
+                - name: GIT_AUTHOR_EMAIL
+                  value: bentley@valentinus.dev
+                - name: GIT_COMMITTER_NAME
+                  value: Bentley
+                - name: GIT_COMMITTER_EMAIL
+                  value: bentley@valentinus.dev
               command:
                 - /bin/sh
                 - -eu
@@ -57,10 +66,8 @@ spec:
                         exit 0
                       fi
 
-                      git config user.name "Flake Bot"
-                      git config user.email "bot@valentinus.dev"
                       git add flake.lock
-                      git commit -m "chore: update flake.lock"
+                      git commit -m "chore(flake): weekly lockfile update" flake.lock
                       git push origin HEAD:unstable
                     '
               resources:
