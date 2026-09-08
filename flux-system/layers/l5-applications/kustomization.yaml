@@ -6,5 +6,6 @@ resources:
   - commafeed.yaml
   - nextcloud.yaml
   - forgejo.yaml
+  - flake-update-cronjob.yaml
   - jellyfin.yaml
   - vaultwarden.yaml

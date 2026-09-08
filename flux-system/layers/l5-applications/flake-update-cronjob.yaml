@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: flake-update
+  namespace: forgejo-k8s
+spec:
+  schedule: "0 5 * * 5"
+  timeZone: Europe/Istanbul
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          volumes:
+            - name: deploy-key
+              secret:
+                secretName: flake-bot-deploy-key
+                defaultMode: 0400
+            - name: workspace
+              emptyDir:
+                sizeLimit: 4Gi
+          containers:
+            - name: flake-update
+              image: nixos/nix:latest
+              command:
+                - /bin/sh
+                - -eu
+                - -c
+              args:
+                - |
+                  export HOME=/workspace/home
+                  export XDG_CACHE_HOME=/workspace/cache
+                  export NIX_CONFIG='experimental-features = nix-command flakes'
+
+                  nix --extra-experimental-features "nix-command flakes" shell \
+                    nixpkgs#coreutils nixpkgs#git nixpkgs#openssh --command \
+                    sh -eu -c '
+                      mkdir -p "$HOME/.ssh" /workspace/repo
+                      cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
+                      chmod 600 "$HOME/.ssh/id_ed25519"
+                      ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+
+                      git clone --branch unstable --single-branch \
+                        ssh://git@forgejo-ssh.forgejo-k8s.svc.cluster.local:22/valeninki/dotfiles.nix.git \
+                        /workspace/repo
+                      cd /workspace/repo
+                      nix --extra-experimental-features "nix-command flakes" flake update
+
+                      if git diff --quiet -- flake.lock; then
+                        echo "flake.lock is already current; nothing to push."
+                        exit 0
+                      fi
+
+                      git config user.name "Flake Bot"
+                      git config user.email "bot@valentinus.dev"
+                      git add flake.lock
+                      git commit -m "chore: update flake.lock"
+                      git push origin HEAD:unstable
+                    '
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 512Mi
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
+              volumeMounts:
+                - name: deploy-key
+                  mountPath: /etc/ssh-key
+                  readOnly: true
+                - name: workspace
+                  mountPath: /workspace
