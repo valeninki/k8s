@@ -15,4 +15,4 @@ configMapGenerator:
   - name: forgejo-theme-catppuccin
     namespace: forgejo-k8s
     files:
-      - theme-catppuccin-mocha-mauve.css
+      - theme-catppuccin-mocha-peach.css

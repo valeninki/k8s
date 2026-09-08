@@ -1,33 +1,33 @@
 :root {
   color-scheme: dark;
   --is-dark-theme: true;
-  accent-color: #cba6f7;
-  --color-primary: #cba6f7;
+  accent-color: #fab387;
+  --color-primary: #fab387;
   --color-primary-contrast: #11111b;
-  --color-primary-hover: rgb(189.3298969072, 142.6030927835, 244.8969072165);
-  --color-primary-dark-1: rgb(194.7979381443, 151.9618556701, 245.7381443299);
-  --color-primary-dark-2: rgb(186.5958762887, 137.9237113402, 244.4762886598);
-  --color-primary-dark-3: rgb(178.393814433, 123.8855670103, 243.2144329897);
-  --color-primary-dark-4: rgb(170.1917525773, 109.8474226804, 241.9525773196);
-  --color-primary-dark-5: rgb(161.9896907216, 95.8092783505, 240.6907216495);
-  --color-primary-dark-6: rgb(153.787628866, 81.7711340206, 239.4288659794);
-  --color-primary-dark-7: rgb(145.5855670103, 67.7329896907, 238.1670103093);
-  --color-primary-light-1: rgb(211.2020618557, 180.0381443299, 248.2618556701);
-  --color-primary-light-2: rgb(219.4041237113, 194.0762886598, 249.5237113402);
-  --color-primary-light-3: rgb(227.606185567, 208.1144329897, 250.7855670103);
-  --color-primary-light-4: rgb(235.8082474227, 222.1525773196, 252.0474226804);
-  --color-primary-light-5: rgb(244.0103092784, 236.1907216495, 253.3092783505);
-  --color-primary-light-6: rgb(252.212371134, 250.2288659794, 254.5711340206);
-  --color-primary-light-7: hsl(267.4074074074, 83.5051546392%, 101.9803921569%);
-  --color-primary-alpha-10: rgba(203, 166, 247, 0.1);
-  --color-primary-alpha-20: rgba(203, 166, 247, 0.2);
-  --color-primary-alpha-30: rgba(203, 166, 247, 0.3);
-  --color-primary-alpha-40: rgba(203, 166, 247, 0.4);
-  --color-primary-alpha-50: rgba(203, 166, 247, 0.5);
-  --color-primary-alpha-60: rgba(203, 166, 247, 0.6);
-  --color-primary-alpha-70: rgba(203, 166, 247, 0.7);
-  --color-primary-alpha-80: rgba(203, 166, 247, 0.8);
-  --color-primary-alpha-90: rgba(203, 166, 247, 0.9);
+  --color-primary-hover: rgb(248.98, 163.496, 110.52);
+  --color-primary-dark-1: rgb(249.388, 169.6976, 120.312);
+  --color-primary-dark-2: rgb(248.776, 160.3952, 105.624);
+  --color-primary-dark-3: rgb(248.164, 151.0928, 90.936);
+  --color-primary-dark-4: rgb(247.552, 141.7904, 76.248);
+  --color-primary-dark-5: rgb(246.94, 132.488, 61.56);
+  --color-primary-dark-6: rgb(246.328, 123.1856, 46.872);
+  --color-primary-dark-7: rgb(245.716, 113.8832, 32.184);
+  --color-primary-light-1: rgb(250.612, 188.3024, 149.688);
+  --color-primary-light-2: rgb(251.224, 197.6048, 164.376);
+  --color-primary-light-3: rgb(251.836, 206.9072, 179.064);
+  --color-primary-light-4: rgb(252.448, 216.2096, 193.752);
+  --color-primary-light-5: rgb(253.06, 225.512, 208.44);
+  --color-primary-light-6: rgb(253.672, 234.8144, 223.128);
+  --color-primary-light-7: rgb(254.284, 244.1168, 237.816);
+  --color-primary-alpha-10: rgba(250, 179, 135, 0.1);
+  --color-primary-alpha-20: rgba(250, 179, 135, 0.2);
+  --color-primary-alpha-30: rgba(250, 179, 135, 0.3);
+  --color-primary-alpha-40: rgba(250, 179, 135, 0.4);
+  --color-primary-alpha-50: rgba(250, 179, 135, 0.5);
+  --color-primary-alpha-60: rgba(250, 179, 135, 0.6);
+  --color-primary-alpha-70: rgba(250, 179, 135, 0.7);
+  --color-primary-alpha-80: rgba(250, 179, 135, 0.8);
+  --color-primary-alpha-90: rgba(250, 179, 135, 0.9);
   --color-secondary: #45475a;
   --color-secondary-dark-1: rgb(55.4076923077, 56.5384615385, 76.8923076923);
   --color-secondary-dark-2: rgb(61.8153846154, 63.0769230769, 85.7846153846);
@@ -206,9 +206,9 @@
   --color-header-wrapper: #181825;
   --color-header-wrapper-transparent: rgba(24, 24, 37, 0);
   --color-label-text: #11111b;
-  --color-label-bg: #cba6f7;
-  --color-label-hover-bg: rgb(186.5958762887, 137.9237113402, 244.4762886598);
-  --color-label-active-bg: rgb(194.7979381443, 151.9618556701, 245.7381443299);
+  --color-label-bg: #fab387;
+  --color-label-hover-bg: rgb(248.776, 160.3952, 105.624);
+  --color-label-active-bg: rgb(249.388, 169.6976, 120.312);
   --color-accent: var(--color-primary-light-1);
   --color-small-accent: var(--color-primary-light-5);
   --color-active-line: #45475a;
@@ -304,7 +304,7 @@ strong.attention-warning {
 }
 
 ::selection {
-  background: rgba(203, 166, 247, 0.3) !important;
+  background: rgba(250, 179, 135, 0.3) !important;
 }
 
 /* NameBuiltinPseudo */
@@ -772,7 +772,7 @@ strong.attention-warning {
   color: #a6adc8 !important;
 }
 .monaco-editor .line-numbers.active-line-number {
-  color: #cba6f7 !important;
+  color: #fab387 !important;
 }
 .monaco-editor .view-overlays .current-line,
 .monaco-editor .margin-view-overlays .current-line-margin {

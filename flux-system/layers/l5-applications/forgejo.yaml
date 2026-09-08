@@ -71,8 +71,8 @@ spec:
           SSH_PORT: 22
           BUILTIN_SSH_SERVER_USER: git
         ui:
-          THEMES: "auto,forgejo-auto,forgejo-light,forgejo-dark,catppuccin-mocha-mauve"
-          DEFAULT_THEME: catppuccin-mocha-mauve
+          THEMES: "auto,forgejo-auto,forgejo-light,forgejo-dark,catppuccin-mocha-peach"
+          DEFAULT_THEME: catppuccin-mocha-peach
         repository:
           ROOT: /data/git/gitea-repositories
         repository.pull-request:
