@@ -37,6 +37,11 @@ spec:
                     secretKeyRef:
                       name: shark-renovate-token
                       key: token
+                - name: RENOVATE_GITHUB_COM_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: shark-github-token
+                      key: token
                 - name: RENOVATE_GIT_AUTHOR
                   value: Shark <shark@valentinus.dev>
                 - name: RENOVATE_ONBOARDING
