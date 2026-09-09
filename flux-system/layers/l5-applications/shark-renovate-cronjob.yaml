@@ -50,6 +50,10 @@ spec:
                   value: "false"
                 - name: RENOVATE_CACHE_DIR
                   value: /tmp/renovate/cache
+                - name: RENOVATE_BINARY_SOURCE
+                  value: install
+                - name: RENOVATE_CONTAINERBASE_DIR
+                  value: /tmp/renovate/containerbase
                 - name: RENOVATE_LOG_LEVEL
                   value: info
               resources:
