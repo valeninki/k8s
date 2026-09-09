@@ -19,9 +19,29 @@ spec:
           nodeSelector:
             kubernetes.io/hostname: w2
           securityContext:
+            fsGroup: 65534
+            fsGroupChangePolicy: OnRootMismatch
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+          initContainers:
+            - name: flux-cli
+              image: ghcr.io/fluxcd/flux-cli@sha256:704d5529535570a495249b643159c93a9aa88ffca07813c974a54b7ba6edbd86
+              command:
+                - /bin/sh
+                - -ec
+                - cp /usr/local/bin/flux /tools/flux && chmod 0555 /tools/flux
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsGroup: 65534
+                runAsUser: 65534
+              volumeMounts:
+                - name: flux-tools
+                  mountPath: /tools
           containers:
             - name: renovate
               image: renovate/renovate:41.140.1@sha256:9c70b9ee7010e5428710c52c37d6385e6420a1385205bd7e7e2048dafc802404
@@ -51,9 +71,9 @@ spec:
                 - name: RENOVATE_CACHE_DIR
                   value: /tmp/renovate/cache
                 - name: RENOVATE_BINARY_SOURCE
-                  value: install
-                - name: RENOVATE_CONTAINERBASE_DIR
-                  value: /tmp/renovate/containerbase
+                  value: global
+                - name: PATH
+                  value: /opt/renovate-tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
                 - name: RENOVATE_LOG_LEVEL
                   value: info
               resources:
@@ -74,7 +94,12 @@ spec:
               volumeMounts:
                 - name: tmp
                   mountPath: /tmp
+                - name: flux-tools
+                  mountPath: /opt/renovate-tools
+                  readOnly: true
           volumes:
             - name: tmp
               emptyDir:
                 sizeLimit: 4Gi
+            - name: flux-tools
+              emptyDir: {}
