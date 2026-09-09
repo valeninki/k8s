@@ -1,0 +1,91 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: flake-update-deps
+  namespace: forgejo-k8s
+spec:
+  schedule: "30 4 * * 5"
+  timeZone: Europe/Istanbul
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: w2
+          volumes:
+            - name: deploy-key
+              secret:
+                secretName: flake-bot-deploy-key
+                defaultMode: 0400
+            - name: workspace
+              emptyDir:
+                sizeLimit: 4Gi
+          containers:
+            - name: flake-update-deps
+              image: nixos/nix:latest
+              env:
+                - name: GIT_AUTHOR_NAME
+                  value: Bentley
+                - name: GIT_AUTHOR_EMAIL
+                  value: bentley@valentinus.dev
+                - name: GIT_COMMITTER_NAME
+                  value: Bentley
+                - name: GIT_COMMITTER_EMAIL
+                  value: bentley@valentinus.dev
+              command:
+                - /bin/sh
+                - -eu
+                - -c
+              args:
+                - |
+                  export HOME=/workspace/home
+                  export XDG_CACHE_HOME=/workspace/cache
+                  export NIX_CONFIG='experimental-features = nix-command flakes'
+
+                  nix --extra-experimental-features "nix-command flakes" shell \
+                    nixpkgs#coreutils nixpkgs#git nixpkgs#openssh --command \
+                    sh -eu -c '
+                      mkdir -p "$HOME/.ssh"
+                      cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
+                      chmod 600 "$HOME/.ssh/id_ed25519"
+                      ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+                      export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"
+
+                      for repo in netui nixpkgs; do
+                        repo_dir="/workspace/$repo"
+                        git clone "ssh://git@forgejo-ssh.forgejo-k8s.svc.cluster.local:22/valeninki/$repo.git" "$repo_dir"
+                        cd "$repo_dir"
+                        nix --extra-experimental-features "nix-command flakes" flake update
+
+                        if git diff --quiet -- flake.lock; then
+                          echo "$repo flake.lock is already current; nothing to push."
+                        else
+                          git add flake.lock
+                          git commit -m "chore(flake): weekly lockfile update" flake.lock
+                          git push origin HEAD
+                        fi
+
+                        cd /workspace
+                      done
+                    '
+              resources:
+                requests:
+                  cpu: 250m
+                  ephemeral-storage: 1Gi
+                  memory: 512Mi
+                limits:
+                  cpu: "2"
+                  ephemeral-storage: 4Gi
+                  memory: 2Gi
+              volumeMounts:
+                - name: deploy-key
+                  mountPath: /etc/ssh-key
+                  readOnly: true
+                - name: workspace
+                  mountPath: /workspace
