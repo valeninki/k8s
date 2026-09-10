@@ -128,7 +128,7 @@ spec:
                             --request POST \
                             --header "Authorization: token $SHARK_TOKEN" \
                             --header "Content-Type: application/json" \
-                            --data "$(jq -nc --arg title "chore($pkg): update to $NEW_VERSION" --arg head "$branch" --arg base "$base_branch" --arg body "Automated update for $pkg to $NEW_VERSION." '{title: $title, head: $head, base: $base, body: $body}')" \
+                            --data "$(jq -nc --arg title "chore($pkg): update to $NEW_VERSION" --arg head "$branch" --arg base "$base_branch" --arg body "Automated update for $pkg to $NEW_VERSION." '"'"'{title: $title, head: $head, base: $base, body: $body}'"'"')" \
                             "$FORGEJO_URL/api/v1/repos/valeninki/nixpkgs/pulls"
                           echo "Created pull request for $pkg $NEW_VERSION."
                         else
