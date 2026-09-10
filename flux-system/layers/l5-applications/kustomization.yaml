@@ -9,6 +9,7 @@ resources:
   - flake-update-cronjob.yaml
   - flake-update-deps-cronjob.yaml
   - shark-renovate-cronjob.yaml
+  - shark-nixpkgs-updater-cronjob.yaml
   - jellyfin.yaml
   - vaultwarden.yaml
 generatorOptions:

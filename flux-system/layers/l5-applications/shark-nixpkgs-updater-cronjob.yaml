@@ -1,0 +1,155 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shark-nixpkgs-updater
+  namespace: forgejo-k8s
+spec:
+  schedule: "0 3 * * 0"
+  timeZone: UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/hostname: w2
+          volumes:
+            - name: deploy-key
+              secret:
+                secretName: flake-bot-deploy-key
+                defaultMode: 0400
+            - name: workspace
+              emptyDir:
+                sizeLimit: 12Gi
+          containers:
+            - name: shark-nixpkgs-updater
+              image: nixos/nix:latest
+              imagePullPolicy: Always
+              env:
+                - name: GIT_AUTHOR_NAME
+                  value: Shark
+                - name: GIT_AUTHOR_EMAIL
+                  value: shark@valentinus.dev
+                - name: GIT_COMMITTER_NAME
+                  value: Shark
+                - name: GIT_COMMITTER_EMAIL
+                  value: shark@valentinus.dev
+                - name: FORGEJO_URL
+                  value: http://forgejo-http.forgejo-k8s.svc.cluster.local:3000
+                - name: SHARK_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: shark-renovate-token
+                      key: token
+              command:
+                - /bin/sh
+                - -eu
+                - -c
+              args:
+                - |
+                  export HOME=/workspace/home
+                  export XDG_CACHE_HOME=/workspace/cache
+                  export NIX_CONFIG='experimental-features = nix-command flakes'
+
+                  nix --extra-experimental-features "nix-command flakes" shell \
+                    nixpkgs#coreutils nixpkgs#curl nixpkgs#git nixpkgs#jq \
+                    nixpkgs#nix-update nixpkgs#openssh --command \
+                    sh -eu -c '
+                      mkdir -p "$HOME/.ssh"
+                      cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
+                      chmod 600 "$HOME/.ssh/id_ed25519"
+                      ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+                      export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"
+
+                      repo_dir=/workspace/nixpkgs
+                      git clone ssh://git@forgejo-ssh.forgejo-k8s.svc.cluster.local:22/valeninki/nixpkgs.git "$repo_dir"
+                      cd "$repo_dir"
+                      base_branch="$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d/ -f2-)"
+                      git checkout -B "$base_branch" "origin/$base_branch"
+
+                      nix flake show --json | jq -r '"'"'.packages["x86_64-linux"] | keys[]'"'"' |
+                      while IFS= read -r pkg; do
+                        if [ "$pkg" = linux-rpi4-minimal ]; then
+                          echo "Skipping excluded package: $pkg"
+                          continue
+                        fi
+
+                        git checkout -B "$base_branch" "origin/$base_branch"
+                        git clean -fd
+                        echo "Updating package: $pkg"
+                        if ! nix-update "$pkg" --flake; then
+                          echo "nix-update failed for $pkg; resetting and continuing."
+                          git reset --hard "origin/$base_branch"
+                          git clean -fd
+                          continue
+                        fi
+
+                        if git diff --quiet; then
+                          echo "$pkg is already current; no pull request needed."
+                          continue
+                        fi
+
+                        if ! nix build ".#$pkg" --no-link; then
+                          echo "Build failed for $pkg; discarding its update."
+                          git reset --hard "origin/$base_branch"
+                          git clean -fd
+                          continue
+                        fi
+
+                        if ! NEW_VERSION="$(nix eval --raw ".#$pkg.version")"; then
+                          echo "Could not determine the updated version for $pkg; discarding its update."
+                          git reset --hard "origin/$base_branch"
+                          git clean -fd
+                          continue
+                        fi
+                        branch="shark/$pkg-$NEW_VERSION"
+                        if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+                          echo "Remote branch $branch already exists."
+                        else
+                          git checkout -b "$branch"
+                          git add -A
+                          git commit -m "chore($pkg): update to $NEW_VERSION"
+                          git push origin "$branch"
+                        fi
+
+                        open_prs="$(curl --fail --silent --show-error \
+                          --header "Authorization: token $SHARK_TOKEN" \
+                          --get \
+                          --data-urlencode state=open \
+                          --data-urlencode "head=valeninki:$branch" \
+                          "$FORGEJO_URL/api/v1/repos/valeninki/nixpkgs/pulls")"
+                        if [ "$(printf %s "$open_prs" | jq length)" -eq 0 ]; then
+                          curl --fail --silent --show-error \
+                            --request POST \
+                            --header "Authorization: token $SHARK_TOKEN" \
+                            --header "Content-Type: application/json" \
+                            --data "$(jq -nc --arg title "chore($pkg): update to $NEW_VERSION" --arg head "$branch" --arg base "$base_branch" --arg body "Automated update for $pkg to $NEW_VERSION." '{title: $title, head: $head, base: $base, body: $body}')" \
+                            "$FORGEJO_URL/api/v1/repos/valeninki/nixpkgs/pulls"
+                          echo "Created pull request for $pkg $NEW_VERSION."
+                        else
+                          echo "An open pull request already exists for $branch."
+                        fi
+
+                        git checkout -B "$base_branch" "origin/$base_branch"
+                      done
+                    '
+              resources:
+                requests:
+                  cpu: 500m
+                  ephemeral-storage: 2Gi
+                  memory: 1Gi
+                limits:
+                  cpu: "3"
+                  ephemeral-storage: 12Gi
+                  memory: 4Gi
+              volumeMounts:
+                - name: deploy-key
+                  mountPath: /etc/ssh-key
+                  readOnly: true
+                - name: workspace
+                  mountPath: /workspace
