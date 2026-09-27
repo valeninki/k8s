@@ -3,7 +3,10 @@ resources:
   - application.yml
 
 secretGenerator:
-  - name: longhorn-minio-credentials
+  # Longhorn references this name directly from defaultBackupStore.
+  - name: cluster-key
     namespace: longhorn-system
     envs:
       - .garage-creds.env
+    options:
+      disableNameSuffixHash: true

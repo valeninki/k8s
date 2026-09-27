@@ -28,6 +28,9 @@ spec:
           - key: "node.kubernetes.io/control-plane"
             operator: "Exists"
             effect: "NoSchedule"
+        defaultBackupStore:
+          backupTarget: s3://cluster-backup@garage/
+          backupTargetCredentialSecret: cluster-key
     repoURL: https://charts.longhorn.io/
     targetRevision: 1.*
   syncPolicy:
