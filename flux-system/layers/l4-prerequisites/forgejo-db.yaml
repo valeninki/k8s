@@ -13,4 +13,4 @@ spec:
       secret:
         name: db-secret
   storage:
-    size: 1Gi
+    size: 8Gi
