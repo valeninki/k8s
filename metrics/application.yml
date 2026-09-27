@@ -69,16 +69,11 @@ spec:
         kube-state-metrics:
           enabled: true
 
-        node-exporter:
+        prometheus-node-exporter:
           enabled: true
 
         defaultRules:
-          rules:
-            kubernetes: true
-            node: true
-            vmagent: true
-            vmsingle: true
-            vmhealth: true
+          enabled: true
     repoURL: https://victoriametrics.github.io/helm-charts
     targetRevision: 0.*
   syncPolicy:

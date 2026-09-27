@@ -11,7 +11,7 @@ spec:
   source:
     chart: jellyfin
     repoURL: https://jellyfin.github.io/jellyfin-helm
-    targetRevision: '2.*'
+    targetRevision: '3.*'
     helm:
       values: |
         podSecurityContext:
@@ -21,7 +21,12 @@ spec:
         
         nodeSelector:
           kubernetes.io/hostname: w1
-        
+
+        # The config PVC contains Jellyfin's SQLite database, so never run two
+        # Jellyfin versions against it during a rolling update.
+        deploymentStrategy:
+          type: Recreate
+
         resources:
           requests:
             cpu: 100m
@@ -29,7 +34,23 @@ spec:
           limits:
             cpu: 500m
             memory: 1Gi
-          
+
+        # Jellyfin binds its HTTP port before its /health endpoint is ready.
+        # Gate liveness and readiness on the actual health endpoint instead.
+        startupProbe:
+          tcpSocket: null
+          httpGet:
+            path: /health
+            port: http
+          # Avoid the brief healthy response exposed before startup tasks begin.
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+
+        # Startup can take more than a minute while plugins and the library load.
+        livenessProbe:
+          initialDelaySeconds: 90
+
         persistence:
           config:
             enabled: true
