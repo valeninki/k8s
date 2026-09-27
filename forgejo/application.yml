@@ -11,7 +11,7 @@ spec:
   project: default
   source:
     repoURL: oci://code.forgejo.org/forgejo-helm/forgejo
-    targetRevision: 16.*
+    targetRevision: 17.*
     path: .
     helm:
       parameters:
@@ -53,7 +53,7 @@ spec:
             - name: FORGEJO__SECURITY__GLOBAL_TWO_FACTOR_REQUIREMENT
               value: all
             - name: FORGEJO__SERVER__SSH_DOMAIN
-              value: git.valentinus.dev
+              value: ssh.git.valentinus.dev
         
           config:
             repository:

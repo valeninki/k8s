@@ -22,9 +22,9 @@ This repository contains my HomeLab's k0s configurations and helm charts.
 
 ## Roadmap
 
-- [ ] Configure ssh for Forgejo with metallb load balancer and traefik.
+- [x] Configure ssh for Forgejo with traefik (hostPort 22, ssh.git.valentinus.dev).
 - [ ] Switch to Kubernetes Gateway API.
-- [ ] Add limits for application and services.
+- [x] Add limits for application and services.
 - [ ] Write custom grafana dashboard for monitoring cluster.
 
 ## Special Thanks

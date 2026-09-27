@@ -20,6 +20,8 @@ spec:
           value: "0"
         - name: ports.websecure.hostPort
           value: "443"
+        - name: ports.ssh.hostPort
+          value: "22"
         - name: ingressClass.enabled
           value: "true"
         - name: ingressClass.isDefaultClass
@@ -31,10 +33,11 @@ spec:
       values: |
         ports:
           ssh:
-            port: 2222
+            port: 22
             expose:
               default: true
-            exposedPort: 2222
+            exposedPort: 22
+            hostPort: 22
             protocol: TCP
         nodeSelector:
           kubernetes.io/hostname: m1
