@@ -12,13 +12,22 @@
     "kubernetes",
     "nix"
   ],
+  "automerge": false,
+  "flux": {
+    "managerFilePatterns": ["/^flux-system\\/.*\\.ya?ml$/"]
+  },
   "packageRules": [
     {
-      "description": "Automerge minor and patch dependency updates",
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": false
+      "description": "Never automerge Kubernetes and Helm dependencies",
+      "matchManagers": ["flux", "kubernetes", "helm-values"],
+      "automerge": false
+    },
+    {
+      "description": "Hold Nextcloud for storage and application audit",
+      "matchPackageNames": ["nextcloud", "nextcloud/*"],
+      "automerge": false,
+      "prCreation": "not-pending",
+      "labels": ["dependencies", "nextcloud", "hold-storage-audit"]
     }
   ]
 }
