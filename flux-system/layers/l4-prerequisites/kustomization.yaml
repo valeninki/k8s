@@ -5,3 +5,4 @@ resources:
   - clusterissuer.yaml
   - wildcard-certificate.yaml
   - forgejo-db.yaml
+  - forgejo-runner.yaml

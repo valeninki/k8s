@@ -3,6 +3,7 @@ resources:
   - ingressroute.yml
   - application.yml
   - database.yml
+  - runner-k8s-rbac.yml
 
 generatorOptions:
   disableNameSuffixHash: true
