@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: "1"
+      GOMAXPROCS: "1"
+      GOFLAGS: "-p=1"
+      CARGO_INCREMENTAL: "0"
+      NIX_CONFIG: "experimental-features = nix-command flakes\nmax-jobs = 1\ncores = 1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Nix installer
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends sudo xz-utils
+          rm -rf /var/lib/apt/lists/*
+      - uses: https://github.com/cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      # flake.nix's acceptanceCheck runs Rust fmt/check/clippy/tests and Go
+      # vet/tests/race tests in one derivation with a shared Cargo target.
+      # Repeating those checks in nix develop compiles the same crates twice.
+      - name: Rust, Go, and flake checks
+        run: nix flake check

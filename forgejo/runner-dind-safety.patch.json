@@ -1,0 +1,32 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "name": "dind",
+            "lifecycle": {
+              "postStart": {
+                "exec": {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "(while true; do sleep 1800; docker system prune -af --filter \"until=2h\" --volumes || true; done) </dev/null >/proc/1/fd/1 2>/proc/1/fd/2 &"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "volumes": [
+          {
+            "name": "docker-storage",
+            "emptyDir": {
+              "sizeLimit": "4Gi"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
