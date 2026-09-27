@@ -88,7 +88,7 @@ spec:
             zz-nc-custom.ini: |-
               memory_limit = 512M
               upload_max_filesize = 2G
-              post_max_size = 600M
+              post_max_size = 2G
               max_execution_time = 300
               file_uploads = On
               allow_url_fopen = On
