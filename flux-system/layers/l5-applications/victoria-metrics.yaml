@@ -27,6 +27,13 @@ spec:
   values:
     grafana:
       plugins: []
+      # Preserve the existing resource-based GOMEMLIMIT instead of the chart's
+      # new literal value; SSA cannot merge both fields on the same env entry.
+      envValueFrom:
+        GOMEMLIMIT:
+          resourceFieldRef:
+            resource: limits.memory
+            divisor: "1"
       persistence:
         enabled: true
         size: 1Gi
