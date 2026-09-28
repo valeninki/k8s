@@ -27,7 +27,7 @@
       "description": "Hold Nextcloud for storage and application audit",
       "matchPackageNames": ["nextcloud", "nextcloud/*"],
       "automerge": false,
-      "prCreation": "not-pending",
+      "prCreation": "immediate",
       "labels": ["dependencies", "nextcloud", "hold-storage-audit"]
     }
   ]
