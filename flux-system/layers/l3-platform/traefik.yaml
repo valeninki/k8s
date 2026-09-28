@@ -62,6 +62,8 @@ spec:
     deployment:
       replicas: 1
       revisionHistoryLimit: 0
+    updateStrategy:
+      type: Recreate
     ingressClass:
       enabled: true
       isDefaultClass: true
