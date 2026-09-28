@@ -2,7 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "dependencyDashboard": true,
-  "prConcurrentLimit": 3,
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 10,
   "gitAuthor": "Shark <shark@valentinus.dev>",
   "enabledManagers": [
     "dockerfile",

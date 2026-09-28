@@ -4,7 +4,7 @@ metadata:
   name: shark-renovate
   namespace: forgejo-k8s
 spec:
-  schedule: "0 6 * * 6"
+  schedule: "*/30 * * * *"
   timeZone: Europe/Istanbul
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
