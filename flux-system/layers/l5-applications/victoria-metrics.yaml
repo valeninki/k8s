@@ -44,7 +44,7 @@ spec:
       resources:
         requests:
           cpu: 50m
-          memory: 128Mi
+          memory: 384Mi
         limits:
           cpu: 300m
           memory: 1Gi
@@ -54,9 +54,6 @@ spec:
       enabled: true
       spec:
         retentionPeriod: "5d"
-        # Temporary recovery override; remove after expired parts are pruned.
-        extraArgs:
-          storage.minFreeDiskSpaceBytes: "10000000"
         storage:
           accessModes:
             - ReadWriteOnce
@@ -66,7 +63,7 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 256Mi
+            memory: 384Mi
           limits:
             cpu: 500m
             memory: 512Mi
