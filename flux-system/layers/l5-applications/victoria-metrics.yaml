@@ -54,6 +54,9 @@ spec:
       enabled: true
       spec:
         retentionPeriod: "5d"
+        # Temporary recovery override; remove after expired parts are pruned.
+        extraArgs:
+          storage.minFreeDiskSpaceBytes: "10000000"
         storage:
           accessModes:
             - ReadWriteOnce
