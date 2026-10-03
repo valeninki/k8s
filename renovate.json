@@ -24,6 +24,14 @@
       "automerge": false
     },
     {
+      "description": "Keep the digest-pinned Forgejo OCI source managed in GitOps, not Renovate",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["flux-system/sources.yaml"],
+      "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
+      "pinDigests": false,
+      "enabled": false
+    },
+    {
       "description": "Hold Nextcloud for storage and application audit",
       "matchPackageNames": ["nextcloud", "nextcloud/*"],
       "automerge": false,

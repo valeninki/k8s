@@ -26,7 +26,7 @@ spec:
               type: RuntimeDefault
           initContainers:
             - name: flux-cli
-              image: ghcr.io/fluxcd/flux-cli@sha256:704d5529535570a495249b643159c93a9aa88ffca07813c974a54b7ba6edbd86
+              image: ghcr.io/fluxcd/flux-cli@sha256:b1ac18156f227af9a524b842a96f2c20986c7a779ef721df3ba4e4540f449d76
               command:
                 - /bin/sh
                 - -ec
