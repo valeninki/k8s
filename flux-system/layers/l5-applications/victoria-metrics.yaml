@@ -26,6 +26,10 @@ spec:
       retries: 0
   values:
     grafana:
+      # A RollingUpdate can place a surge pod on another worker while the
+      # existing pod holds the RWO Longhorn PVC, blocking volume attachment.
+      deploymentStrategy:
+        type: Recreate
       plugins: []
       # Preserve the existing resource-based GOMEMLIMIT instead of the chart's
       # new literal value; SSA cannot merge both fields on the same env entry.
