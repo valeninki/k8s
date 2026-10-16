@@ -115,4 +115,4 @@ spec:
   interval: 1h
   url: oci://code.forgejo.org/forgejo-helm/forgejo
   ref:
-    digest: sha256:791cebc465996e84478b23c2f62d1f6441836226d3c75f09cae4a1e62e67beeb
+    digest: sha256:38d6d9ea57512808754d310bd6c0fe717d697b5f67ea4e34bdb8500ab49b0343
