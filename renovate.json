@@ -11,12 +11,23 @@
     "github-actions",
     "helm-values",
     "kubernetes",
-    "nix"
+    "nix",
+    "custom.regex"
   ],
   "automerge": false,
   "flux": {
     "managerFilePatterns": ["/^flux-system\\/.*\\.ya?ml$/"]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^flux-system\\/sources\\.yaml$/"],
+      "matchStrings": ["url: oci://code\\.forgejo\\.org/forgejo-helm/forgejo\\s+ref:\\s+# renovate: chart=(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s+digest: (?<currentDigest>sha256:[a-f0-9]{64})"],
+      "depNameTemplate": "code.forgejo.org/forgejo-helm/forgejo",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver"
+    }
+  ],
   "packageRules": [
     {
       "description": "Never automerge Kubernetes and Helm dependencies",
@@ -24,12 +35,22 @@
       "automerge": false
     },
     {
-      "description": "Keep the digest-pinned Forgejo OCI source managed in GitOps, not Renovate",
+      "description": "Delegate this digest-only OCI source to the version-aware custom manager; Flux ignores ref.tag when ref.digest is set",
       "matchManagers": ["flux"],
       "matchFileNames": ["flux-system/sources.yaml"],
       "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
-      "pinDigests": false,
       "enabled": false
+    },
+    {
+      "description": "Only reviewed Forgejo 15 LTS chart mappings: 17.1.5=15.0.7, 17.3.1=15.0.10. Review appVersion and rendered image before extending this allowlist; chart major is not app major",
+      "matchManagers": ["custom.regex"],
+      "matchFileNames": ["flux-system/sources.yaml"],
+      "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
+      "allowedVersions": "/^(17\\.1\\.5|17\\.3\\.1)$/",
+      "pinDigests": true,
+      "automerge": false,
+      "draftPR": true,
+      "recreateWhen": "never"
     },
     {
       "description": "Hold Nextcloud for storage and application audit",
