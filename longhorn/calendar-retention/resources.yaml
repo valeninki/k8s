@@ -1,0 +1,178 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+rules:
+- apiGroups:
+  - longhorn.io
+  resources:
+  - volumes
+  - snapshots
+  - backups
+  - backupvolumes
+  - backuptargets
+  - engines
+  - replicas
+  - nodes
+  - settings
+  - snapshotgroups
+  - recurringjobs
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - longhorn.io
+  resources:
+  - backups
+  verbs:
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  resourceNames:
+  - longhorn-snapshot-retention
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: longhorn-snapshot-retention
+subjects:
+- kind: ServiceAccount
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: longhorn-retention-ownership-read
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - namespaces
+  resourceNames:
+  - kube-system
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-retention-ownership-read
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: longhorn-retention-ownership-read
+subjects:
+- kind: ServiceAccount
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+---
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/ssa: IfNotPresent
+spec: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-snapshot-retention
+  namespace: longhorn-system
+spec:
+  schedule: 0 3 * * *
+  timeZone: Europe/Istanbul
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  suspend: true
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 604800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: longhorn-snapshot-retention
+        spec:
+          serviceAccountName: longhorn-snapshot-retention
+          restartPolicy: Never
+          containers:
+          - name: retention
+            image: docker.io/library/python:3.12.12-alpine3.22@sha256:848ba4413eb897e225159b8fc1b02094576cbae4aa73fc13142608ae2c8c0e32
+            imagePullPolicy: IfNotPresent
+            command:
+            - python
+            - /etc/retention/retention.py
+            - --apply
+            env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: '1'
+            - name: PYTHONTZPATH
+              value: /etc/retention/zoneinfo
+            volumeMounts:
+            - name: policy
+              mountPath: /etc/retention
+              readOnly: true
+            resources:
+              requests:
+                cpu: 25m
+                memory: 48Mi
+              limits:
+                cpu: 200m
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 65534
+              capabilities:
+                drop:
+                - ALL
+              seccompProfile:
+                type: RuntimeDefault
+          volumes:
+          - name: policy
+            configMap:
+              name: longhorn-snapshot-retention
+              defaultMode: 292
+              items:
+              - key: retention.py
+                path: retention.py
+              - key: safety.py
+                path: safety.py
+              - key: policy.json
+                path: policy.json
+              - key: Istanbul
+                path: zoneinfo/Europe/Istanbul
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault

@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- resources.yaml
+configMapGenerator:
+- name: longhorn-snapshot-retention
+  namespace: longhorn-system
+  files:
+  - retention.py
+  - safety.py
+  - policy.json
+  - Istanbul
+generatorOptions:
+  disableNameSuffixHash: true

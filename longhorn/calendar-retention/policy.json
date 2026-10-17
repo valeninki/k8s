@@ -1,0 +1,8 @@
+{
+  "suspended": true,
+  "clusterUID": "11e00a5d-817e-4d80-904a-56161ab2d6e4",
+  "targets": {},
+  "namespaceHolds": {
+    "forgejo-k8s": "Forgejo preparation: preserve native and coordinated recovery inputs; PR #22 remains manual"
+  }
+}
