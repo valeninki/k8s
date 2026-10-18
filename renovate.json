@@ -23,7 +23,8 @@
       "customType": "regex",
       "managerFilePatterns": ["/^flux-system\\/sources\\.yaml$/"],
       "matchStrings": ["url: oci://code\\.forgejo\\.org/forgejo-helm/forgejo\\s+ref:\\s+# renovate: chart=(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s+digest: (?<currentDigest>sha256:[a-f0-9]{64})"],
-      "depNameTemplate": "code.forgejo.org/forgejo-helm/forgejo",
+      "depNameTemplate": "forgejo",
+      "packageNameTemplate": "code.forgejo.org/forgejo-helm/forgejo",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     }
