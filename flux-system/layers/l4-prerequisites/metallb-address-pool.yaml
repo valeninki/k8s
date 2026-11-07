@@ -1,3 +1,7 @@
+# No L2Advertisement/BGPAdvertisement exists on purpose: the LoadBalancer IPs
+# are only used as stable in-cluster addresses, and public traffic arrives via
+# the Traefik service externalIPs/hostPorts on m1. This range is reserved in
+# Calico IPAM by calico-ipreservation.yaml.
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:

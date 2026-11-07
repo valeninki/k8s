@@ -1,0 +1,11 @@
+# The MetalLB pool (172.16.20.0/24) lies inside the Calico pod pool
+# (172.16.0.0/16). Reserve it so Calico IPAM never hands those addresses
+# to pods. Cluster-scoped; Calico is k0s-managed without the v3 API server,
+# so the crd.projectcalico.org/v1 API is the one Calico reads.
+apiVersion: crd.projectcalico.org/v1
+kind: IPReservation
+metadata:
+  name: metallb-default-pool
+spec:
+  reservedCIDRs:
+    - 172.16.20.0/24
