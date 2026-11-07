@@ -62,7 +62,6 @@ spec:
     additionalArguments:
       - --providers.kubernetescrd.allowCrossNamespace=true
       - --providers.kubernetescrd.allowExternalNameServices=true
-      - --serverstransport.insecureskipverify=true
     deployment:
       replicas: 1
       revisionHistoryLimit: 0
