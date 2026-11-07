@@ -59,16 +59,19 @@ spec:
             'tempdirectory' => '/var/www/html/data/tmp',
             'files.chunked_upload.max_size' => 10485760,
           );
+      # With nginx enabled the chart mounts these into /usr/local/etc/php-fpm.d/,
+      # which php-fpm only includes as *.conf, so they must use pool syntax.
       phpConfigs:
-        zz-nc-custom.ini: |-
-          memory_limit = 512M
-          upload_max_filesize = 2G
-          post_max_size = 2G
-          max_execution_time = 300
-          file_uploads = On
-          allow_url_fopen = On
+        zz-nc-custom.conf: |-
+          [www]
+          php_admin_value[memory_limit] = 512M
+          php_admin_value[upload_max_filesize] = 2G
+          php_admin_value[post_max_size] = 2G
+          php_admin_value[max_execution_time] = 300
+          php_admin_flag[file_uploads] = on
+          php_admin_flag[allow_url_fopen] = on
           ; /tmp is a 1Gi in-memory emptyDir, too small for 2G uploads.
-          upload_tmp_dir = /var/www/html/data/tmp
+          php_admin_value[upload_tmp_dir] = /var/www/html/data/tmp
       extraVolumes:
         - name: nextcloud-tmp
           emptyDir:
@@ -120,6 +123,14 @@ spec:
       enabled: false
     nginx:
       enabled: true
+      config:
+        # Chart default, with the body limit raised to match post_max_size.
+        serverBlockCustom: |
+          # set max upload size
+          client_max_body_size 2G;
+          client_body_timeout 300s;
+          fastcgi_buffers 64 4K;
+          fastcgi_read_timeout 3600s;
     persistence:
       enabled: true
       accessMode: ReadWriteOnce
