@@ -22,14 +22,11 @@ spec:
     remediation:
       retries: 0
   values:
-    global:
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
-        - key: node.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
+    # Longhorn intentionally runs only on the workers (w1, w2). The control
+    # plane (m1) keeps its node-role.kubernetes.io/control-plane:NoSchedule
+    # taint and gets no longhorn-manager/CSI pods. To change that, the
+    # toleration must also be set via defaultSettings.taintToleration, which
+    # Longhorn only applies while all volumes are detached.
     defaultBackupStore:
       backupTarget: s3://cluster-backup@garage/
       backupTargetCredentialSecret: cluster-key
@@ -37,5 +34,11 @@ spec:
       jobEnabled: true
     longhornUI:
       replicas: 1
+    persistence:
+      # Replica count of the chart-managed "longhorn" StorageClass (this
+      # chart owns the StorageClass; it is no longer a separate manifest).
+      # Only two nodes hold data, so 3 replicas would leave every new volume
+      # permanently degraded. Existing volumes keep their own replica count.
+      defaultClassReplicaCount: 2
     defaultSettings:
-      replicaCount: 2
+      defaultReplicaCount: '{"v1":"2","v2":"2"}'
