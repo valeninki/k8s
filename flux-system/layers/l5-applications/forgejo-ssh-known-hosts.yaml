@@ -1,0 +1,11 @@
+# Pinned SSH host key of the in-cluster Forgejo (/data/ssh/gitea.rsa.pub),
+# used by the bot CronJobs instead of trusting ssh-keyscan on every run.
+# Update it if the Forgejo host key is ever regenerated.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forgejo-ssh-known-hosts
+  namespace: forgejo-k8s
+data:
+  known_hosts: |
+    forgejo-ssh.forgejo-k8s.svc.cluster.local ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFvyzoERpFWgpMQHvxe9tfukZmjkpUqbK3iVGU0CakVtiqlffeiEbNilfbLQsHBLsV8ASW9Kvbw9bHhRNrsPzgo+9MhrxlSpdYDSayz7udAPixst7D1kKXoJDBi+l26ZI/VL9gCgmsyIhJ1QJrk02nDfdnLtpAzDVnUrYXZarjwc9cst4BPVFkuMHm5SgTVFl4qEkzKcb0dq50+VnQg1i3giHNFRkZ4c/4nekHi444b8mtkn4P5hV79EV3MIRhdYqaaKHZH6aZd3Snv6UewQJXcKE7r553LU3rN1vFgwdrf0vHNyZZoF0bj0vO94hT9Ng49k/zlAZ6wKg8E9BTxByvMe5rnZM4P7dlQWmb555DUDyjvy1epLVq3tkPIKcYchYGY2q8ye/dvgs5un4ULicm1MDRsQbEHqkTR2JoTqJzi5cH5hSxYDtXlgNqTPYpcLyoO2bOR3PYK9AK7HnDJX5cEDWucF1huHEvsjcjS8kcUgHyqq0IGKxlOiQCXY5lNsL1oGqXjOWc/+BxAJT/TrRMevA+uT3EXDzaLUfDNOr9MlGi0VoDX9aMNq3IIwGlCjoYfZ49wDNtqGQkn+jnOuY7HsX4Kn0yDVO7Zac87mqVbbtz/HSAzBvNC7y0iUQeh6wbGxhUHKxX8zyE6qVbABVsVGiATv+iVsx4KpKhtC8xaQ==

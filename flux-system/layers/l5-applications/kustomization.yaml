@@ -11,6 +11,7 @@ resources:
   - flake-update-deps-cronjob.yaml
   - shark-renovate-cronjob.yaml
   - shark-nixpkgs-updater-cronjob.yaml
+  - forgejo-ssh-known-hosts.yaml
   - jellyfin.yaml
   - vaultwarden.yaml
 generatorOptions:

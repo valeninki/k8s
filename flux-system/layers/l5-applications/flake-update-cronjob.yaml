@@ -23,12 +23,15 @@ spec:
               secret:
                 secretName: flake-bot-deploy-key
                 defaultMode: 0400
+            - name: known-hosts
+              configMap:
+                name: forgejo-ssh-known-hosts
             - name: workspace
               emptyDir:
                 sizeLimit: 4Gi
           containers:
             - name: flake-update
-              image: nixos/nix:latest
+              image: nixos/nix:2.35.4
               env:
                 - name: GIT_AUTHOR_NAME
                   value: Bentley
@@ -51,10 +54,13 @@ spec:
                   nix --extra-experimental-features "nix-command flakes" shell \
                     nixpkgs#coreutils nixpkgs#git nixpkgs#openssh --command \
                     sh -eu -c '
-                      mkdir -p "$HOME/.ssh" /workspace/repo
+                      # The workspace emptyDir survives OnFailure container
+                      # restarts; start from a clean clone each attempt.
+                      rm -rf /workspace/repo
+                      mkdir -p "$HOME/.ssh"
                       cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
                       chmod 600 "$HOME/.ssh/id_ed25519"
-                      ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+                      cp /etc/ssh-known-hosts/known_hosts "$HOME/.ssh/known_hosts"
                       export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"
 
                       git clone --branch unstable --single-branch \
@@ -84,6 +90,9 @@ spec:
               volumeMounts:
                 - name: deploy-key
                   mountPath: /etc/ssh-key
+                  readOnly: true
+                - name: known-hosts
+                  mountPath: /etc/ssh-known-hosts
                   readOnly: true
                 - name: workspace
                   mountPath: /workspace

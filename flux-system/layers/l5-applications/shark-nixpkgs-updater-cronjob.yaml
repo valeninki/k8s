@@ -23,12 +23,15 @@ spec:
               secret:
                 secretName: flake-bot-deploy-key
                 defaultMode: 0400
+            - name: known-hosts
+              configMap:
+                name: forgejo-ssh-known-hosts
             - name: workspace
               emptyDir:
                 sizeLimit: 12Gi
           containers:
             - name: shark-nixpkgs-updater
-              image: nixos/nix:latest
+              image: nixos/nix:2.35.4
               imagePullPolicy: Always
               env:
                 - name: GIT_AUTHOR_NAME
@@ -63,10 +66,13 @@ spec:
                       mkdir -p "$HOME/.ssh"
                       cp /etc/ssh-key/id_ed25519 "$HOME/.ssh/id_ed25519"
                       chmod 600 "$HOME/.ssh/id_ed25519"
-                      ssh-keyscan -p 22 forgejo-ssh.forgejo-k8s.svc.cluster.local >> "$HOME/.ssh/known_hosts"
+                      cp /etc/ssh-known-hosts/known_hosts "$HOME/.ssh/known_hosts"
                       export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes"
 
                       repo_dir=/workspace/nixpkgs
+                      # The workspace emptyDir survives OnFailure container
+                      # restarts; start from a clean clone each attempt.
+                      rm -rf "$repo_dir"
                       git clone ssh://git@forgejo-ssh.forgejo-k8s.svc.cluster.local:22/valeninki/nixpkgs.git "$repo_dir"
                       cd "$repo_dir"
                       base_branch="$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d/ -f2-)"
@@ -117,13 +123,28 @@ spec:
                           git push origin "$branch"
                         fi
 
-                        open_prs="$(curl --fail --silent --show-error \
-                          --header "Authorization: token $SHARK_TOKEN" \
-                          --get \
-                          --data-urlencode state=open \
-                          --data-urlencode "head=valeninki:$branch" \
-                          "$FORGEJO_URL/api/v1/repos/valeninki/nixpkgs/pulls")"
-                        if [ "$(printf %s "$open_prs" | jq length)" -eq 0 ]; then
+                        # The Forgejo pulls API has no head filter, so page
+                        # through all open PRs and match the head branch.
+                        pr_exists=0
+                        page=1
+                        while :; do
+                          open_prs="$(curl --fail --silent --show-error \
+                            --header "Authorization: token $SHARK_TOKEN" \
+                            --get \
+                            --data-urlencode state=open \
+                            --data-urlencode limit=50 \
+                            --data-urlencode "page=$page" \
+                            "$FORGEJO_URL/api/v1/repos/valeninki/nixpkgs/pulls")"
+                          if [ "$(printf %s "$open_prs" | jq length)" -eq 0 ]; then
+                            break
+                          fi
+                          if [ "$(printf %s "$open_prs" | jq --arg b "$branch" '"'"'[.[] | select(.head.ref == $b or .head.label == $b)] | length'"'"')" -gt 0 ]; then
+                            pr_exists=1
+                            break
+                          fi
+                          page=$((page + 1))
+                        done
+                        if [ "$pr_exists" -eq 0 ]; then
                           curl --fail --silent --show-error \
                             --request POST \
                             --header "Authorization: token $SHARK_TOKEN" \
@@ -150,6 +171,9 @@ spec:
               volumeMounts:
                 - name: deploy-key
                   mountPath: /etc/ssh-key
+                  readOnly: true
+                - name: known-hosts
+                  mountPath: /etc/ssh-known-hosts
                   readOnly: true
                 - name: workspace
                   mountPath: /workspace
