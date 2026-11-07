@@ -6,6 +6,7 @@ resources:
   - commafeed.yaml
   - nextcloud.yaml
   - forgejo.yaml
+  - forgejo-runner.yaml
   - flake-update-cronjob.yaml
   - flake-update-deps-cronjob.yaml
   - shark-renovate-cronjob.yaml

@@ -20,6 +20,8 @@ data:
       enabled: false
     container:
       network: ""
+      # Job containers are unprivileged, so jobs on the "docker" label
+      # (docker:dind image) cannot start a nested Docker daemon themselves.
       privileged: false
       docker_host: "-"
       valid_volumes: []
@@ -66,11 +68,16 @@ spec:
             - |
               cd /data
               until [ -s /certs/client/ca.pem ] && [ -s /certs/client/cert.pem ]; do sleep 2; done
+              # Retry until Forgejo is reachable (e.g. on a fresh bootstrap
+              # where Forgejo starts in the same layer) instead of crashing.
               if [ ! -s /data/.runner ]; then
-                forgejo-runner register --no-interactive --config /config/config.yaml \
+                until forgejo-runner register --no-interactive --config /config/config.yaml \
                   --instance http://forgejo-http.forgejo-k8s.svc.cluster.local:3000 \
                   --token "$RUNNER_TOKEN" --name k8s-dind-runner-1 \
-                  --labels ubuntu-latest:docker://node:20-bookworm,docker:docker://docker:dind,k8s-dind:docker://node:20-bookworm
+                  --labels ubuntu-latest:docker://node:20-bookworm,docker:docker://docker:dind,k8s-dind:docker://node:20-bookworm; do
+                  echo "runner registration failed, retrying in 10s" >&2
+                  sleep 10
+                done
               fi
               exec forgejo-runner daemon --config /config/config.yaml
           env:
@@ -101,6 +108,15 @@ spec:
           image: docker:28.3.0-dind
           securityContext:
             privileged: true
+          lifecycle:
+            postStart:
+              exec:
+                # Every 30 min prune unused Docker objects older than 2h so
+                # docker-storage does not grow until the sizeLimit evicts the pod.
+                command:
+                  - /bin/sh
+                  - -c
+                  - (while true; do sleep 1800; docker system prune -af --filter "until=2h" --volumes || true; done) </dev/null >/proc/1/fd/1 2>/proc/1/fd/2 &
           env:
             - name: DOCKER_TLS_CERTDIR
               value: /certs
@@ -122,4 +138,5 @@ spec:
         - name: certs
           emptyDir: {}
         - name: docker-storage
-          emptyDir: {}
+          emptyDir:
+            sizeLimit: 8Gi
