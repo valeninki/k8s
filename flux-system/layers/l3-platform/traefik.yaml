@@ -43,6 +43,8 @@ spec:
         # clients simply stay on HTTP/2.
         http3:
           enabled: true
+          # Advertise the public port in Alt-Svc, not the container port 8443.
+          advertisedPort: 443
     nodeSelector:
       kubernetes.io/hostname: m1
     tolerations:
