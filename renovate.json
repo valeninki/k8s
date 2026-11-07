@@ -9,13 +9,15 @@
     "dockerfile",
     "flux",
     "github-actions",
-    "helm-values",
     "kubernetes",
     "nix",
     "custom.regex"
   ],
   "automerge": false,
   "flux": {
+    "managerFilePatterns": ["/^flux-system\\/.*\\.ya?ml$/"]
+  },
+  "kubernetes": {
     "managerFilePatterns": ["/^flux-system\\/.*\\.ya?ml$/"]
   },
   "customManagers": [
@@ -32,8 +34,14 @@
   "packageRules": [
     {
       "description": "Never automerge Kubernetes and Helm dependencies",
-      "matchManagers": ["flux", "kubernetes", "helm-values"],
+      "matchManagers": ["flux", "kubernetes"],
       "automerge": false
+    },
+    {
+      "description": "Flux controller images are upgraded together with the Flux CLI (flux install --export), not image by image",
+      "matchManagers": ["kubernetes"],
+      "matchFileNames": ["flux-system/gotk-components.yaml"],
+      "enabled": false
     },
     {
       "description": "Delegate this digest-only OCI source to the version-aware custom manager; Flux ignores ref.tag when ref.digest is set",
