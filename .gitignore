@@ -3,4 +3,3 @@
 !**/*.example*
 **/generated_values.yaml
 charts/
-adguard-home/*-tls.yaml

@@ -1,10 +1,6 @@
-resources:
-  - namespace.yml
-  - ingressroute.yml
-  - application.yml
-  - database.yml
-  - runner-k8s-rbac.yml
-
+# Out-of-band Secret bootstrap (not applied by Flux).
+# Copy each .*.env.example to the same name without .example, fill it in,
+# then run: kubectl apply -k forgejo/
 generatorOptions:
   disableNameSuffixHash: true
 

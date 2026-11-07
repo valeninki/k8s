@@ -98,15 +98,6 @@ spec:
   url: https://nextcloud.github.io/helm/
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: argo
-  namespace: flux-system
-spec:
-  interval: 1h
-  url: https://argoproj.github.io/argo-helm
----
-apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
   name: forgejo
