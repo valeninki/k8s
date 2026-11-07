@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - victoria-metrics-grafana.yaml
   - adguard-home-header.yaml
+  - adguard-home-servers-transport.yaml
   - adguard-home-main.yaml
   - commafeed.yaml
   - forgejo.yaml
@@ -10,6 +11,5 @@ resources:
   - jellyfin.yaml
   - nextcloud-dav-redirect.yaml
   - nextcloud-hsts-header.yaml
-  - nextcloud-req-buffer.yaml
   - nextcloud.yaml
   - vaultwarden.yaml

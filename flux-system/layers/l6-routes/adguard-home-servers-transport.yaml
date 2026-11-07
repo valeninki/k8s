@@ -1,0 +1,10 @@
+# AdGuard Home serves HTTPS with a certificate copied in by its init container
+# at pod start, so it can be stale after cert-manager renewals. Skip backend
+# verification for this route only (in-cluster hop) instead of globally.
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: adguard-home-insecure
+  namespace: adguard-home-k8s
+spec:
+  insecureSkipVerify: true

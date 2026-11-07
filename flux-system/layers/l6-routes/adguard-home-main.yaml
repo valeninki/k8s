@@ -18,6 +18,7 @@ spec:
           passHostHeader: true
           port: web-ssl
           scheme: https
+          serversTransport: adguard-home-insecure
   tls:
     domains:
       - main: dns.valentinus.dev

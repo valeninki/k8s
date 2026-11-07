@@ -7,4 +7,3 @@ spec:
   headers:
     customRequestHeaders:
       Host: adguard-home-main.adguard-home-k8s.svc.cluster.local:443
-      X-Real-IP: localhost
