@@ -38,6 +38,11 @@ spec:
         exposedPort: 443
         hostPort: 443
         protocol: TCP
+        # Adds the websecure-http3 UDP port (container 8443/UDP, hostPort 443).
+        # UDP 443 must also be open in the Hetzner firewall; if it is not,
+        # clients simply stay on HTTP/2.
+        http3:
+          enabled: true
     nodeSelector:
       kubernetes.io/hostname: m1
     tolerations:
@@ -55,7 +60,6 @@ spec:
         cpu: 500m
         memory: 512Mi
     additionalArguments:
-      - --entrypoints.name.http3
       - --providers.kubernetescrd.allowCrossNamespace=true
       - --providers.kubernetescrd.allowExternalNameServices=true
       - --serverstransport.insecureskipverify=true
