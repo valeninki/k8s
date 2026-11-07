@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - victoria-metrics.yaml
   - adguard-home.yaml
+  - adguard-home-netpol.yaml
   - commafeed.yaml
   - nextcloud.yaml
   - forgejo.yaml

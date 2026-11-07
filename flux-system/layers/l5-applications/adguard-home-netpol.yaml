@@ -1,4 +1,5 @@
----
+# Restricts AdGuard Home ingress to private ranges and an allowlist of
+# public CIDRs. Previously applied by hand from adguard-home/netpol.yml.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
