@@ -60,6 +60,19 @@ spec:
       automountServiceAccountToken: false
       securityContext:
         fsGroup: 1000
+      # CI jobs (Rust builds) can use several GiB of memory. Never co-locate
+      # the runner with Forgejo or its Postgres: on 2026-11-08 a job on the
+      # same node thrashed it until Postgres was OOM-killed and Forgejo went
+      # down. If no node qualifies, the runner stays Pending instead.
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values: [forgejo, forgejo-db]
       containers:
         - name: runner
           image: data.forgejo.org/forgejo/runner:13.2.1
@@ -128,9 +141,11 @@ spec:
           # Jobs run inside this sidecar, so it carries the job's memory and
           # disk. Nix flake checks compile Rust (clippy + tests) here; a single
           # rustc peaks around 3.1 GB RSS, plus the Nix evaluator alongside.
+          # Request equals limit so the scheduler reserves the memory instead
+          # of overcommitting the node (the nodes have 7.6Gi each).
           resources:
-            requests: {cpu: 250m, memory: 1Gi}
-            limits: {cpu: "1500m", memory: 5Gi}
+            requests: {cpu: 250m, memory: 4Gi}
+            limits: {cpu: "1500m", memory: 4Gi}
       volumes:
         - name: config
           configMap:
