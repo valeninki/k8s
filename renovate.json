@@ -11,8 +11,7 @@
     "flux",
     "github-actions",
     "kubernetes",
-    "nix",
-    "custom.regex"
+    "nix"
   ],
   "automerge": false,
   "flux": {
@@ -21,17 +20,6 @@
   "kubernetes": {
     "managerFilePatterns": ["/^flux-system\\/.*\\.ya?ml$/"]
   },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": ["/^flux-system\\/sources\\.yaml$/"],
-      "matchStrings": ["url: oci://code\\.forgejo\\.org/forgejo-helm/forgejo\\s+ref:\\s+# renovate: chart=(?<currentValue>\\d+\\.\\d+\\.\\d+)\\s+digest: (?<currentDigest>sha256:[a-f0-9]{64})"],
-      "depNameTemplate": "forgejo",
-      "packageNameTemplate": "code.forgejo.org/forgejo-helm/forgejo",
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "semver"
-    }
-  ],
   "packageRules": [
     {
       "description": "Never automerge Kubernetes and Helm dependencies",
@@ -61,19 +49,9 @@
       "prBodyNotes": ["Merge this first: the fluxcd/flux2 (gotk-components.yaml) update is generated with this flux CLI and only produces changes once it runs the new version."]
     },
     {
-      "description": "Delegate this digest-only OCI source to the version-aware custom manager; Flux ignores ref.tag when ref.digest is set",
-      "matchManagers": ["flux"],
-      "matchFileNames": ["flux-system/sources.yaml"],
-      "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
-      "enabled": false
-    },
-    {
       "description": "Stay on the Forgejo 15 LTS line: every chart 17.x ships Forgejo 15.0.x (17.0.0=15.0.0 ... 17.3.2=15.0.11). Chart major is not app major, so check appVersion before allowing chart 18",
-      "matchManagers": ["custom.regex"],
-      "matchFileNames": ["flux-system/sources.yaml"],
       "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
       "allowedVersions": "<18.0.0",
-      "pinDigests": true,
       "automerge": false,
       "draftPR": true,
       "recreateWhen": "never"

@@ -106,5 +106,4 @@ spec:
   interval: 1h
   url: oci://code.forgejo.org/forgejo-helm/forgejo
   ref:
-    # renovate: chart=17.3.2
-    digest: sha256:73accaef0604d6e701a7b141e71a8b9a007c1475807240403d8bca0aeda24b74
+    tag: 17.3.2
