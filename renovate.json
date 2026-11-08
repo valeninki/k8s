@@ -44,6 +44,17 @@
       "enabled": false
     },
     {
+      "description": "Renovate itself has thousands of releases; building release notes for a multi-major jump pegs a CPU for ~40 minutes on every run",
+      "matchPackageNames": ["renovate/renovate"],
+      "fetchChangeLogs": "off"
+    },
+    {
+      "description": "Renovate regenerates gotk-components.yaml with the flux binary copied from this image, so the fluxcd/flux2 update stays empty until this one is merged",
+      "matchManagers": ["kubernetes"],
+      "matchPackageNames": ["ghcr.io/fluxcd/flux-cli"],
+      "prBodyNotes": ["Merge this first: the fluxcd/flux2 (gotk-components.yaml) update is generated with this flux CLI and only produces changes once it runs the new version."]
+    },
+    {
       "description": "Delegate this digest-only OCI source to the version-aware custom manager; Flux ignores ref.tag when ref.digest is set",
       "matchManagers": ["flux"],
       "matchFileNames": ["flux-system/sources.yaml"],
