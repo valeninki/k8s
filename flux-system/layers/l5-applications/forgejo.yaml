@@ -21,6 +21,9 @@ spec:
     remediation:
       retries: 0
   values:
+    # Chart 17.x defaults to Forgejo 15.0.x; run the Forgejo 17 release instead.
+    image:
+      tag: "17.0.1"
     nodeSelector:
       kubernetes.io/hostname: w2
     resources:

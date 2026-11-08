@@ -49,7 +49,7 @@
       "prBodyNotes": ["Merge this first: the fluxcd/flux2 (gotk-components.yaml) update is generated with this flux CLI and only produces changes once it runs the new version."]
     },
     {
-      "description": "Stay on the Forgejo 15 LTS line: every chart 17.x ships Forgejo 15.0.x (17.0.0=15.0.0 ... 17.3.2=15.0.11). Chart major is not app major, so check appVersion before allowing chart 18",
+      "description": "Chart 17.x defaults to Forgejo 15.0.x, but forgejo.yaml pins image.tag to Forgejo 17 (not tracked by Renovate: bump it by hand). Chart major is not app major, so check appVersion before allowing chart 18",
       "matchPackageNames": ["code.forgejo.org/forgejo-helm/forgejo"],
       "allowedVersions": "<18.0.0",
       "automerge": false,
