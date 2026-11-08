@@ -31,7 +31,7 @@ spec:
                 sizeLimit: 12Gi
           containers:
             - name: shark-nixpkgs-updater
-              image: nixos/nix:2.35.4
+              image: nixos/nix:2.35.5
               imagePullPolicy: Always
               env:
                 - name: GIT_AUTHOR_NAME

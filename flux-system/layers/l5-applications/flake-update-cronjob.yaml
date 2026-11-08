@@ -31,7 +31,7 @@ spec:
                 sizeLimit: 4Gi
           containers:
             - name: flake-update
-              image: nixos/nix:2.35.4
+              image: nixos/nix:2.35.5
               env:
                 - name: GIT_AUTHOR_NAME
                   value: Bentley
