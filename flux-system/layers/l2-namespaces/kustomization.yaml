@@ -9,6 +9,7 @@ resources:
   - longhorn-system.yaml
   - metrics-k8s.yaml
   - adguard-home-k8s.yaml
+  - attic-k8s.yaml
   - commafeed-k8s.yaml
   - forgejo-k8s.yaml
   - nextcloud-k8s.yaml

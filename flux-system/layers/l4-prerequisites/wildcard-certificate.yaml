@@ -8,9 +8,9 @@ spec:
   secretTemplate:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "adguard-home-k8s,commafeed-k8s,forgejo-k8s,metrics-k8s,nextcloud-k8s,vaultwarden-k8s"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "adguard-home-k8s,attic-k8s,commafeed-k8s,forgejo-k8s,metrics-k8s,nextcloud-k8s,vaultwarden-k8s"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "adguard-home-k8s,commafeed-k8s,forgejo-k8s,metrics-k8s,nextcloud-k8s,vaultwarden-k8s"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "adguard-home-k8s,attic-k8s,commafeed-k8s,forgejo-k8s,metrics-k8s,nextcloud-k8s,vaultwarden-k8s"
   dnsNames:
     - valentinus.dev
     - '*.valentinus.dev'

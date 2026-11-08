@@ -1,0 +1,12 @@
+# Out-of-band Secret bootstrap (not applied by Flux).
+# Copy each .*.env.example to the same name without .example, fill it in,
+# then run: kubectl apply -k attic/
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: attic-secret
+    namespace: attic-k8s
+    envs:
+      - ./.token.env
+      - ./.s3.env

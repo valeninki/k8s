@@ -5,6 +5,7 @@ resources:
   - adguard-home-header.yaml
   - adguard-home-servers-transport.yaml
   - adguard-home-main.yaml
+  - attic.yaml
   - commafeed.yaml
   - forgejo.yaml
   - forgejo-ssh-public-service.yaml

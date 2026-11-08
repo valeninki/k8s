@@ -1,0 +1,203 @@
+# Attic: self-hosted Nix binary cache (https://github.com/zhaofengli/attic).
+# NAR chunks live in the off-cluster Garage bucket `nix-cache`; only the small
+# SQLite metadata database is on Longhorn. The `attic-secret` Secret is
+# bootstrapped out of band (see attic/kustomization.yml) and must exist before
+# this layer is applied, or the Deployment never becomes ready.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: attic-config
+  namespace: attic-k8s
+data:
+  server.toml: |
+    listen = "[::]:8080"
+
+    # Requests with any other Host header are rejected. api-endpoint is left
+    # unset on purpose: the server then advertises the host the client used,
+    # so in-cluster CI keeps pushing through the Service while the public
+    # hostname (behind Cloudflare's 100 MB request limit) is only used from
+    # outside.
+    allowed-hosts = ["cache.valentinus.dev", "attic.attic-k8s.svc.cluster.local"]
+
+    [database]
+    url = "sqlite:///data/server.db?mode=rwc"
+
+    [storage]
+    type = "s3"
+    region = "garage"
+    bucket = "nix-cache"
+    endpoint = "http://10.10.20.10:3900"
+    # Credentials come from AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY.
+
+    [chunking]
+    nar-size-threshold = 65536
+    min-size = 16384
+    avg-size = 65536
+    max-size = 262144
+
+    [compression]
+    type = "zstd"
+
+    [garbage-collection]
+    interval = "12 hours"
+    # Objects nobody has fetched for this long are deleted. Dependency
+    # artifacts are reused until Cargo.lock changes, so this mostly expires
+    # old commits' builds.
+    default-retention-period = "30 days"
+
+    # No [jwt.signing] table: the signing key is read from
+    # ATTIC_SERVER_TOKEN_RS256_SECRET_BASE64 (an empty table would not parse).
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: attic-data
+  namespace: attic-k8s
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attic
+  namespace: attic-k8s
+  labels:
+    app.kubernetes.io/name: attic
+spec:
+  replicas: 1
+  strategy:
+    # SQLite on a ReadWriteOnce volume: never run two servers at once.
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: attic
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: attic
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: attic
+          # Upstream publishes no versioned tags; pin the digest of `latest`.
+          image: ghcr.io/zhaofengli/attic:latest@sha256:18574aba70fc89d2b695273fbe2e7b2f8ad7e8e786b4cc535124fbe14bada1d0
+          args: ["--config", "/config/server.toml", "--mode", "monolithic"]
+          envFrom:
+            - secretRef:
+                name: attic-secret
+          ports:
+            - name: http
+              containerPort: 8080
+          # allowed-hosts rejects the probe's pod-IP Host header, so probe
+          # the socket rather than an HTTP path.
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: "1", memory: 512Mi}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: attic-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: attic-data
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: attic
+  namespace: attic-k8s
+spec:
+  selector:
+    app.kubernetes.io/name: attic
+  ports:
+    # Port 80 so in-cluster clients send a bare Host header that matches
+    # allowed-hosts.
+    - name: http
+      port: 80
+      targetPort: http
+---
+# Only Traefik (public route) and the Forgejo runner (CI jobs run in its dind
+# sidecar, so they reach the cluster from the runner pod's IP) may connect.
+# The server itself only needs the Garage S3 endpoint and cluster DNS.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: attic
+  namespace: attic-k8s
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: attic
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: forgejo-k8s
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: forgejo-runner
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.10.20.10/32
+      ports:
+        - protocol: TCP
+          port: 3900
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
