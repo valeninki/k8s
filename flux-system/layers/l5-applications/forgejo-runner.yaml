@@ -23,6 +23,14 @@ data:
       # Job containers are unprivileged, so jobs on the "docker" label
       # (docker:dind image) cannot start a nested Docker daemon themselves.
       privileged: false
+      # dind creates job containers under the host cgroup root
+      # (/docker/<id>), outside this pod's cgroup, so the pod's resource
+      # limits do NOT cap jobs. Limit every job container directly; keep this
+      # within the dind sidecar's memory request so the node reservation
+      # still covers it.
+      # --init runs tini as PID 1 so orphaned processes are reaped; the
+      # default `tail -f /dev/null` PID 1 leaves them as zombies forever.
+      options: "--init --memory=4g --memory-swap=4g --cpus=1.5"
       docker_host: "-"
       valid_volumes: []
 ---
