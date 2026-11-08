@@ -26,7 +26,7 @@ spec:
               type: RuntimeDefault
           initContainers:
             - name: flux-cli
-              image: ghcr.io/fluxcd/flux-cli@sha256:b1ac18156f227af9a524b842a96f2c20986c7a779ef721df3ba4e4540f449d76
+              image: ghcr.io/fluxcd/flux-cli:v2.9.6@sha256:b1ac18156f227af9a524b842a96f2c20986c7a779ef721df3ba4e4540f449d76
               command:
                 - /bin/sh
                 - -ec
@@ -44,7 +44,7 @@ spec:
                   mountPath: /tools
           containers:
             - name: renovate
-              image: renovate/renovate:41.140.1@sha256:9c70b9ee7010e5428710c52c37d6385e6420a1385205bd7e7e2048dafc802404
+              image: renovate/renovate:44.222.2@sha256:227e723ed8c57f1b8b629066c7e0ad8d8f933d905f4a2f6fb4d597a74118637c
               args:
                 - valeninki/k8s
               env:
@@ -52,6 +52,11 @@ spec:
                   value: forgejo
                 - name: RENOVATE_ENDPOINT
                   value: http://forgejo-http.forgejo-k8s.svc.cluster.local:3000/api/v1/
+                # Clone and push through the in-cluster endpoint too, instead of
+                # the public clone URL (hairpins via the external IP and has failed
+                # with gnutls_handshake errors).
+                - name: RENOVATE_GIT_URL
+                  value: endpoint
                 - name: RENOVATE_TOKEN
                   valueFrom:
                     secretKeyRef:
