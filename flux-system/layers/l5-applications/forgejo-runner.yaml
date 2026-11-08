@@ -125,9 +125,12 @@ spec:
               mountPath: /certs
             - name: docker-storage
               mountPath: /var/lib/docker
+          # Jobs run inside this sidecar, so it carries the job's memory and
+          # disk. Nix flake checks compile Rust (clippy + tests) here; a single
+          # rustc peaks around 3.1 GB RSS, plus the Nix evaluator alongside.
           resources:
-            requests: {cpu: 250m, memory: 512Mi}
-            limits: {cpu: "1500m", memory: 2Gi}
+            requests: {cpu: 250m, memory: 1Gi}
+            limits: {cpu: "1500m", memory: 5Gi}
       volumes:
         - name: config
           configMap:
@@ -139,4 +142,8 @@ spec:
           emptyDir: {}
         - name: docker-storage
           emptyDir:
-            sizeLimit: 8Gi
+            # Holds job images and the job container's writable layer
+            # (including a fresh /nix/store and cargo target dirs). Going over
+            # the limit evicts the runner pod mid-job; keep it below the node's
+            # free disk minus the kubelet's 10% nodefs eviction threshold.
+            sizeLimit: 15Gi
