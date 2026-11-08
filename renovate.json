@@ -2,6 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "dependencyDashboard": true,
+  "dependencyDashboardHeader": "Renovate updates for this cluster. Nothing is merged automatically: review each PR and merge it into `k0s`, then Flux deploys it.\n\n- Merge the `flux-cli` update before `fluxcd/flux2` (gotk-components.yaml is generated with that CLI).\n- Forgejo chart updates open as draft PRs: check for a recent Longhorn backup, then mark ready and merge.\n- Major updates: read the release notes before merging.",
   "prHourlyLimit": 0,
   "prConcurrentLimit": 10,
   "gitAuthor": "Shark <shark@valentinus.dev>",
@@ -41,6 +42,11 @@
       "description": "Flux controller images are upgraded together with the Flux CLI (flux install --export), not image by image",
       "matchManagers": ["kubernetes"],
       "matchFileNames": ["flux-system/gotk-components.yaml"],
+      "enabled": false
+    },
+    {
+      "description": "Don't track resource apiVersions (HelmRelease helm.toolkit.fluxcd.io/v2, CronJob batch/v1, ...): they fill the dashboard and almost never update",
+      "matchDatasources": ["kubernetes-api"],
       "enabled": false
     },
     {
