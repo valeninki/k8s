@@ -44,7 +44,7 @@ spec:
                   mountPath: /tools
           containers:
             - name: renovate
-              image: renovate/renovate:44.257.9@sha256:d6b65ff3562dd499240b23d34ef806ec7e5fd2675e4236a027dfb36774f2aa75
+              image: renovate/renovate:44.260.3@sha256:3a3afa18062aa0514f32cd636cdd08f4b6c68cb62e699e5729511d1127ad7b05
               args:
                 - valeninki/k8s
               env:
